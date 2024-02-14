@@ -10,7 +10,7 @@ import {
 
 interface ThemeContextProps {
   theme: boolean; // 1 - dark, 0 - light
-  switchTheme: Dispatch<SetStateAction<boolean>>;
+  switchTheme: () => void;
 }
 
 export const ThemeContext = createContext<ThemeContextProps>({
@@ -25,7 +25,7 @@ interface ThemeContextProviderProps {
 export const ThemeContextProvider: FC<ThemeContextProviderProps> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<boolean>(true);
+  const [theme, setTheme] = useState<boolean>(false);
   const switchTheme = () => setTheme(!theme);
   return (
     <ThemeContext.Provider value={{ theme, switchTheme }}>

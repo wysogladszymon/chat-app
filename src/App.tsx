@@ -6,12 +6,15 @@ import {
   Navigate,
 } from "react-router-dom";
 import { SignupPage, LoginPage, Home } from "./pages";
-import { auth } from "./config/firebase";
+import { useAuthContext } from "./store/AuthContext";
+import { useEffect, useState } from "react";
 
 function App() {
-  const { currentUser } = auth;
-  return (
-    <Router>
+  const { currentUser } = useAuthContext();
+  const [app, setApp] = useState(<>Loading...</>)
+  
+  useEffect(() => {
+    setApp(<Router>
       <Routes>
         <Route
           path="/"
@@ -28,6 +31,9 @@ function App() {
       </Routes>
     </Router>
   );
+  }, [currentUser]);
+  return app
+    
 }
 
 export default App;

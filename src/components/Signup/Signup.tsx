@@ -5,7 +5,8 @@ import { Google } from "../";
 import { Link } from "react-router-dom";
 interface SignupProps {
   theme?: string | boolean;
-  submitFunction?: (e: React.FormEvent<HTMLFormElement>) => void;
+  signupFunction: (e: React.FormEvent<HTMLFormElement>) => void;
+  signupGoogle: () => void;
   title: string;
   error?: string;
   link: string;
@@ -13,7 +14,8 @@ interface SignupProps {
 
 export const Signup: FC<SignupProps> = ({
   theme,
-  submitFunction,
+  signupFunction,
+  signupGoogle,
   title,
   error,
   link,
@@ -44,7 +46,7 @@ export const Signup: FC<SignupProps> = ({
   return (
     <form
       style={{ fontFamily: "Quicksand, sans-serif" }}
-      onSubmit={submitFunction}
+      onSubmit={signupFunction}
       className={`${styles.form} ${
         !theme ? styles.lightform : styles.darkform
       }`}
@@ -67,6 +69,7 @@ export const Signup: FC<SignupProps> = ({
       </div>
       <div className={styles.div}>
         <input
+          name="username"
           className={`${styles.input} ${
             !theme ? styles.lightinput : styles.darkinput
           }`}
@@ -76,6 +79,7 @@ export const Signup: FC<SignupProps> = ({
       </div>
       <div className={styles.div}>
         <input
+          name="email"
           className={`${styles.input} ${
             !theme ? styles.lightinput : styles.darkinput
           }`}
@@ -85,6 +89,7 @@ export const Signup: FC<SignupProps> = ({
       </div>
       <div className={styles.div}>
         <input
+          name="password"
           className={`${styles.input} ${
             !theme ? styles.lightinput : styles.darkinput
           }`}
@@ -98,14 +103,15 @@ export const Signup: FC<SignupProps> = ({
         {error}
         <br />{" "}
       </p>
-      <p
+      <button
         className={`${styles.submit} ${
           !theme ? styles.lightbutton : styles.darkbutton
         }`}
       >
         Sign Up
-      </p>
+      </button>
       <div
+        onClick={signupGoogle}
         className={`${styles.google} ${
           !theme ? styles.lightgoogle : styles.darkgoogle
         }`}

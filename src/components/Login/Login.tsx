@@ -7,7 +7,8 @@ import { Link } from "react-router-dom";
 
 interface LoginProps {
   theme?: string | boolean;
-  submitFunction?: (e: React.FormEvent<HTMLFormElement>) => void;
+  loginFunction: (e: React.FormEvent<HTMLFormElement>) => void;
+  loginGoogle: () => void;
   title: string;
   error?: string;
   link: string;
@@ -15,10 +16,11 @@ interface LoginProps {
 
 export const Login: FC<LoginProps> = ({
   theme,
-  submitFunction,
+  loginFunction,
   title,
   error,
   link,
+  loginGoogle
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const handleClick = () => {
@@ -46,7 +48,7 @@ export const Login: FC<LoginProps> = ({
   return (
     <form
       style={{ fontFamily: "Quicksand, sans-serif" }}
-      onSubmit={submitFunction}
+      onSubmit={loginFunction}
       className={`${styles.form} ${
         !theme ? styles.lightform : styles.darkform
       }`}
@@ -69,15 +71,17 @@ export const Login: FC<LoginProps> = ({
       </div>
       <div className={styles.div}>
         <input
+        name='email'
           className={`${styles.input} ${
             !theme ? styles.lightinput : styles.darkinput
           }`}
-          placeholder="Email or username"
+          placeholder="Email"
           type="text"
         />
       </div>
       <div className={styles.div}>
         <input
+        name='password'
           className={`${styles.input} ${
             !theme ? styles.lightinput : styles.darkinput
           }`}
@@ -91,19 +95,20 @@ export const Login: FC<LoginProps> = ({
         {error}
         <br />{" "}
       </p>
-      <p
+      <button
         className={`${styles.submit} ${
           !theme ? styles.lightbutton : styles.darkbutton
         }`}
       >
         Log in
-      </p>
+      </button>
       <div
+      onClick={loginGoogle}
         className={`${styles.google} ${
           !theme ? styles.lightgoogle : styles.darkgoogle
         }`}
       >
-        <Google /> <p className={styles.googletext}>Sign up with Google</p>
+        <Google /> <p className={styles.googletext}>Log in with Google</p>
       </div>
       <p
         className={`${styles.p} ${!theme ? styles.lighttext : styles.darktext}`}
