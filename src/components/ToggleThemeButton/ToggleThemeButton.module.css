@@ -1,0 +1,52 @@
+
+.div {
+    width: 60px;
+    height: 30px;
+    padding:0px;
+}
+.button {
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    border-radius: 30px;
+    position:relative;
+    cursor:pointer;
+    transition: 0.2s background-color ease-in-out
+}
+
+.circle{
+    content:'';
+    background-color: #fff;
+    width:27px;
+    height:27px;
+    z-index:200;
+    position:absolute;
+    border-radius:50%;
+    margin: 1.5px;
+    margin-left:2.5px;
+    translate: 0px;
+    transition: 0.2s translate ease-in-out;
+}
+
+
+#check{
+    width:60px;
+    height:60px;
+    display:none;
+}
+
+.moon{
+    z-index:100;
+    position:absolute;
+    right: 8px;
+    translate: 0 -50%;
+    top:15px;
+}
+
+.sun{
+    z-index:100;
+    position:absolute;
+    left: 8px;
+    translate: 0 -50%;
+    top:15px;
+}

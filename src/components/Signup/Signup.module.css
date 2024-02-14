@@ -1,0 +1,157 @@
+.form {
+  display: flex;
+  gap: 10px;
+  width: 350px;
+  max-height: 600px;
+  flex-direction: column;
+  padding: 20px 60px;
+  justify-content: center;
+  border-radius: 10px;
+  align-items: center;
+  --primarylightcolor: #a7bcff;
+  --primarydarkcolor: hsl(230, 50%, 70%);
+  --background-white: #fff;
+  --background-dark: #2c2c2c;
+}
+
+.darkform {
+  box-shadow: 10px 10px 15px -10px rgba(0, 0, 0, 0.5);
+  color: #eee;
+
+  background-color: var(--background-dark);
+  /* box-shadow: 10px 10px 15px -10px rgba(250, 250, 250, 0.5); */
+}
+
+.lightform {
+  background-color: var(--background-white);
+  box-shadow: 10px 10px 15px -10px rgba(0, 0, 0, 0.5);
+}
+
+.div {
+  position: relative;
+}
+.eye {
+  position: absolute;
+}
+
+.input {
+  padding: 15px;
+  border: none;
+  background-color: transparent;
+  max-width: 200px;
+  padding-right: 40px;
+}
+
+.lightinput {
+  border-bottom: 1px solid #a7bcff;
+  color: #111;
+}
+.darkinput {
+  border-bottom: 1px solid var(--primarydarkcolor);
+  color: #eee;
+}
+.input::placeholder {
+  color: rgb(175, 175, 175);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  translate: 0 -50%;
+}
+.submit {
+  width: 100%;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: black;
+  border: solid var(--primarylightcolor) 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+}
+
+.p {
+  margin-top: 5px;
+}
+
+.header {
+  font-size: 30px;
+  margin: 5px;
+}
+.signup {
+  font-size: 20px;
+  margin: 5px;
+  outline: none;
+  border: none;
+}
+
+.lightbutton {
+  background-color: var(--primarylightcolor);
+}
+
+.darkbutton {
+  background-color: #e6e6fa;
+}
+
+.lighttext {
+  color: #5d5d8d;
+}
+
+.darktext {
+  color: #eee;
+}
+.error {
+  color: #e34f4f;
+  margin: 0px;
+}
+
+.google {
+  position: relative;
+  height: 40px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+  border-radius: 5px;
+  border: #5d5d8d solid 2px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.googletext {
+  min-width: 150px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.headercontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  gap: 0px;
+}
+
+.lightgoogle {
+  background-color: var(--background-light);
+  color: #5d5d8d;
+}
+.darkgoogle {
+  background-color: var(--background-light);
+  color: #eee;
+}
+
+@media (width < 600px) {
+  form {
+    padding: 20px 40px;
+  }
+}
