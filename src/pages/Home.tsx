@@ -1,7 +1,6 @@
 import { FC, ReactNode } from "react";
 import { useThemeContext } from "../store/ThemeContext";
-import { ToggleThemeButton } from "../components";
-
+import { ToggleThemeButton, Logout } from "../components";
 interface HomeProps {
   children?: ReactNode;
 }
@@ -11,7 +10,7 @@ export const Home: FC<HomeProps> = ({ children }) => {
 
   return (
     <div
-      className={`relative min-w-[100vw] min-h-[100vh] flex items-center justify-center ${
+      className={`relative min-w-[100vw] min-h-[100vh] flex items-center justify-center flex-col ${
         theme ? "bg-gray-900" : "bg-blue-200"
       } `}
     >
@@ -19,7 +18,9 @@ export const Home: FC<HomeProps> = ({ children }) => {
         <ToggleThemeButton />
       </div>
       <p>Congratz</p>
-      <div></div>
+      <div>
+        <Logout />
+      </div>
     </div>
   );
 };

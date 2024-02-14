@@ -2,8 +2,8 @@ import { FC, useState } from "react";
 import { Login } from "../components";
 import { useThemeContext } from "../store/ThemeContext";
 import { ToggleThemeButton } from "../components";
-import { AuthError, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { AuthError, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../config/firebase";
 import { useAuthContext } from "../store/AuthContext";
 import { useNavigate } from "react-router-dom";
 interface LoginPageProps {}
@@ -33,7 +33,12 @@ export const LoginPage: FC<LoginPageProps> = () => {
       setError(eerr?.message)
     }
   };
-  const googlelogin = () =>{
+  const googlelogin = async () =>{
+    const user = await signInWithPopup(auth, googleProvider).then((userCredential)=>{
+      const userdata = userCredential.user;
+      setCurrentUser(userdata); 
+      nav('/');
+    })
   }
 
   return (

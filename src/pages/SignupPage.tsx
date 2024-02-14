@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth, googleProvider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
 
@@ -45,7 +45,14 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
       setError(eerr?.message);
     }
   };
-  const googlesignup = () => {};
+  const googlesignup = async () => {
+    const user = await signInWithPopup(auth,googleProvider).then((userCredential) => {
+      const userdata = userCredential.user;
+      console.log("--------------------- user: ----------------------\n",userdata);
+      setCurrentUser(userdata);
+      nav('/');
+    });   
+  };
   return (
     <div
       className={`relative min-w-[100vw] min-h-[100vh] flex items-center justify-center ${
