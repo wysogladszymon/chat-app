@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
-import { auth, googleProvider } from "../config/firebase";
+import { auth, googleProvider, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
 
@@ -20,38 +20,45 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
   const { theme } = useThemeContext();
   const [error, setError] = useState<string>("");
   const nav = useNavigate();
-  const {setCurrentUser} = useAuthContext();
+  const { setCurrentUser } = useAuthContext();
 
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { username, password, email } = Object.fromEntries(
+    let { username, password, email } = Object.fromEntries(
       new FormData(e.target as HTMLFormElement)
     );
+    username = String(username);
+    password = String(password);
+    email = String(email);
+
     try {
       setError("");
-      const user = await createUserWithEmailAndPassword(
-        auth,
-        String(email),
-        String(password)
-      ).then((userCredential) => {
-        const userdata = userCredential.user;
-        console.log("--------------------- user: ----------------------\n",userdata);
-        setCurrentUser(userdata);
-        nav('/');
-      });   
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(res.user, {
+        displayName: username,
+      }).then(() => {
+        setCurrentUser(res.user);
+        console.log("Registered succesfully: ", res.user);
+      });
     } catch (err) {
       const eerr = err as AuthError;
+      console.log(eerr.code);
+
       setError(eerr?.message);
     }
   };
+  
   const googlesignup = async () => {
-    const user = await signInWithPopup(auth,googleProvider).then((userCredential) => {
-      const userdata = userCredential.user;
-      console.log("--------------------- user: ----------------------\n",userdata);
-      setCurrentUser(userdata);
-      nav('/');
-    });   
+    const res = await signInWithPopup(auth, googleProvider).then(
+      (userCredential) => {
+        const userdata = userCredential.user;
+        console.log("Registered succesfully: ", userdata);
+
+        setCurrentUser(userdata);
+        nav("/");
+      }
+    );
   };
   return (
     <div

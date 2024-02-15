@@ -1,0 +1,43 @@
+.messages {
+  flex: 1;
+  border: solid black 2px;
+}
+
+.profilePhoto {
+  position: relative;
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  margin:20px;
+}
+
+.changePhoto {
+  opacity: 0;
+  position: absolute;
+  bottom: 5px;
+  font-size: 13px;
+  left: 50%;
+  translate: -50% 0;
+  text-wrap: nowrap;
+  background-color: #636363;
+  width: 100%;
+  text-align: center;
+  color: white;
+}
+
+.profilePhoto:hover .changePhoto {
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+  cursor: pointer;
+}
+
+#fileinput {
+}
+
+.logout {
+  position: relative;
+  width: 0px;
+}

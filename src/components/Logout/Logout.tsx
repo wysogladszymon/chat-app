@@ -17,14 +17,9 @@ export const Logout: FC<LogoutProps> = ({ children }) => {
     setCurrentUser(null);
   };
   return (
-    <button
-      className={`flex relative border-2 border-solid `}
-      onClick={handleClick}
-    >
-      <IoIosLogOut
-        className={`absolute top-[50%] translate-y-[-50%] left-0 `}
-      />
-      <p className={` pr-10 pl-10`}>Logout</p>
-    </button>
+    <IoIosLogOut onClick={handleClick}
+      size={"100%"}
+      className={` cursor-pointer text-gray-400 border-gray-200 hover:border-indigo-600 hover:text-indigo-600 flex shrink-0 items-center justify-center rounded-lg border text-[0.625rem] transition-all duration-300`}
+    />
   );
 };
