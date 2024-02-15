@@ -9,3 +9,4 @@ export * from "./UserData";
 export * from "./AddFriend";
 export * from "./FriendRequests";
 export * from "./Messages";
+export * from './ChatInfo';
