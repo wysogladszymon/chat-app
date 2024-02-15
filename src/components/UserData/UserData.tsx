@@ -37,6 +37,8 @@ export const UserData: FC<UserDataProps> = ({ children }) => {
 
   useEffect(() => {
     setPhoto(currentUser?.photoURL);
+    console.log(photo);
+    
   }, [currentUser, editPhoto]);
 
   return (
@@ -71,7 +73,7 @@ export const UserData: FC<UserDataProps> = ({ children }) => {
         <h1 className={` font-bold text-xl`}>{currentUser?.displayName}</h1>
         <p className={` text-gray-400`}>{currentUser?.email}</p>
       </div>
-      <div className='h-12 w-12 ml-20'>
+      <div className="h-12 w-12 ml-20">
         <Logout />
       </div>
     </div>

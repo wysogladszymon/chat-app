@@ -21,7 +21,7 @@ export const ChatApp: FC<ChatAppProps> = ({ children }) => {
     <div className=" h-screen flex justify-center items-center w-screen">
       {/* sidebar */}
       <div className="flex flex-col border-r-2 h-full relative pt-5 max-w-[512px]">
-        <div className=" flex align-center justify-end ">
+        <div className="flex align-center justify-end ">
           <ToggleThemeButton />
         </div>
         <div className="mt-20 ">
