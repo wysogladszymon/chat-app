@@ -10,3 +10,7 @@ export * from "./AddFriend";
 export * from "./FriendRequests";
 export * from "./Messages";
 export * from './ChatInfo';
+export * from './NavIcon';
+export * from './FriendRequestsMenu';
+export * from './AddFriendMenu';
+export * from './Welcome';

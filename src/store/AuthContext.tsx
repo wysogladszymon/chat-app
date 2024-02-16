@@ -11,7 +11,7 @@ import {
 import { auth } from "../config/firebase";
 import { User } from "firebase/auth";
 
-type myUser = User | null;
+export type myUser = User | null;
 
 interface AuthContextProps {
   currentUser: myUser;
