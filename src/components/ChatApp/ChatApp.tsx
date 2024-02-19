@@ -7,7 +7,7 @@ import {
   Messages,
   Message,
   FriendRequestsMenu,
-  AddFriendMenu
+  AddFriendMenu,
 } from "../";
 import pic from "../../assets/defaultPicture.png";
 import { useActiveContext } from "../../store/ActiveContext";
@@ -18,11 +18,11 @@ interface ChatAppProps {
 
 export const ChatApp: FC<ChatAppProps> = ({ children }) => {
   const { activeState, dispatchActive } = useActiveContext();
-  const handleFriendReq = () =>{
-    dispatchActive({type:'FRIEND_REQUEST', payload: null});
+  const handleFriendReq = () => {
+    dispatchActive({ type: "FRIEND_REQUEST", payload: null });
   };
-  const handleAddFriend = () =>{
-    dispatchActive({type:'ADD_FRIEND', payload: null})
+  const handleAddFriend = () => {
+    dispatchActive({ type: "ADD_FRIEND", payload: null });
   };
 
   return (
@@ -33,11 +33,13 @@ export const ChatApp: FC<ChatAppProps> = ({ children }) => {
           <ToggleThemeButton />
         </div>
         <div className="mt-20 ">
-          <AddFriend onClick={handleAddFriend}/>
-          <FriendRequests onClick={handleFriendReq}/>
+          <AddFriend onClick={handleAddFriend} />
+          <FriendRequests onClick={handleFriendReq} />
         </div>
         <p className="p-4 text-gray-400 text-sm">chats</p>
-        <div className=" grow">
+        <div
+          className={` grow flex flex-col justify-self-end overflow-auto`}
+        >
           <ChatInfo
             name={"Natalka"}
             lastmsg={"What's up?"}
@@ -59,9 +61,11 @@ export const ChatApp: FC<ChatAppProps> = ({ children }) => {
             </Message>
           </Messages>
         )}
-        {activeState.addFriend && <AddFriendMenu /> }
-        {activeState.friendRequest && <FriendRequestsMenu /> }
-        {!activeState.friendRequest && !activeState.chat && !activeState.addFriend && <Welcome /> }
+        {activeState.addFriend && <AddFriendMenu />}
+        {activeState.friendRequest && <FriendRequestsMenu />}
+        {!activeState.friendRequest &&
+          !activeState.chat &&
+          !activeState.addFriend && <Welcome />}
       </div>
     </div>
   );

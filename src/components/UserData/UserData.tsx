@@ -36,9 +36,7 @@ export const UserData: FC<UserDataProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    setPhoto(currentUser?.photoURL);
-    console.log(photo);
-    
+    setPhoto(currentUser?.photoURL);    
   }, [currentUser, editPhoto]);
 
   return (

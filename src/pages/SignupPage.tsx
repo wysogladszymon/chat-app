@@ -11,6 +11,7 @@ import {
 import { auth, googleProvider, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
+import { doc, setDoc } from "firebase/firestore";
 
 interface SignupPageProps {
   children?: ReactNode;
@@ -35,11 +36,20 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
     try {
       setError("");
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(res.user, {
+      const user = await updateProfile(res.user, {
         displayName: username,
-      }).then(() => {
-        setCurrentUser(res.user);
-        console.log("Registered succesfully: ", res.user);
+      });
+      setCurrentUser({
+        ...res.user,
+        displayName: username,
+      });
+      console.log("Registered succesfully: ", res.user);
+      await setDoc(doc(db, "users", res.user.uid), {
+        displayName: res.user.displayName,
+        displayNameLower: res.user.displayName?.toLowerCase(),
+        email: res.user.email,
+        photoURL: res.user.photoURL,
+        uid: res.user.uid,
       });
     } catch (err) {
       const eerr = err as AuthError;
@@ -48,14 +58,22 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
       setError(eerr?.message);
     }
   };
-  
+
   const googlesignup = async () => {
     const res = await signInWithPopup(auth, googleProvider).then(
-      (userCredential) => {
+      async (userCredential) => {
         const userdata = userCredential.user;
         console.log("Registered succesfully: ", userdata);
 
         setCurrentUser(userdata);
+
+        await setDoc(doc(db, "users", userdata.uid), {
+          displayName: userdata.displayName,
+          displayNameLower: userdata.displayName?.toLowerCase(),
+          email: userdata.email,
+          photoURL: userdata.photoURL,
+          uid: userdata.uid,
+        });
         nav("/");
       }
     );
