@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import { db } from "../../config/firebase";
 import {
   collection,
@@ -21,18 +21,15 @@ type fetchedUser = {
   photoURL: string | null;
   uid: string;
 };
-interface AddFriendMenuProps {
-  children?: ReactNode;
-}
+interface AddFriendMenuProps {}
 
-export const AddFriendMenu: FC<AddFriendMenuProps> = ({ children }) => {
+export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
   const [user, setUser] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<fetchedUser[]>([]);
   const { currentUser } = useAuthContext();
 
   const handleKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return;
-    console.log(user);
 
     const usersRef = collection(db, "users");
 
@@ -54,7 +51,6 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = ({ children }) => {
         });
     });
     setSearchedUsers(users);
-    console.log(users);
   };
 
   const handleClick = async (id: string) => {
@@ -70,10 +66,12 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = ({ children }) => {
               displayName: currentUser?.displayName,
               photoURL: currentUser?.photoURL,
               uid: currentUser?.uid,
-            } as fetchedUser,
-          ],
+            } ,
+          ] as fetchedUser[],
         });
       } else {
+        const ans = await checkExistance(id);
+        if (ans) return;
         const userData = docSnap.data();
         await updateDoc(docRef, {
           users: [
@@ -83,7 +81,7 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = ({ children }) => {
               displayName: currentUser?.displayName,
               photoURL: currentUser?.photoURL,
               uid: currentUser?.uid,
-            } ,
+            },
           ] as fetchedUser[],
         });
       }
@@ -92,7 +90,26 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = ({ children }) => {
     }
   };
 
+  const checkExistance = async (id: string) => {
+    try {
+      const docRef = doc(db, "friendrequests", id);
+      const docSnap = await getDoc(docRef);
 
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+
+        if (userData && userData.users) {
+          const data : fetchedUser[] = userData.users;
+          const ans = data.some((i) => i.uid === currentUser?.uid);
+          return ans;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
   return (
     <div className="w-full h-full bg-gray-100 flex flex-col p-10 ">
       <h1 className="text-3xl pl-3">Add Friend</h1>

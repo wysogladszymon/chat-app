@@ -1,7 +1,6 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode } from "react";
 import { LuSend } from "react-icons/lu";
 import { GoFileMedia } from "react-icons/go";
-import { Scrollbars } from "react-custom-scrollbars";
 import styles from "./Messages.module.css";
 interface MessagesProps {
   children?: ReactNode;

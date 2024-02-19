@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import { LuUserPlus } from "react-icons/lu";
 import { useThemeContext } from "../store/ThemeContext";
 

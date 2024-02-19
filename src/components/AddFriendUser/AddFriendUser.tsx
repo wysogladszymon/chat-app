@@ -1,10 +1,9 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./AddFriendUser.module.css";
 import pic from "../../assets/defaultPicture.png";
 
 interface AddFriendUserProps {
   displayName: string;
-  children?: ReactNode;
   email: string;
   photoURL: string | null;
   onClick: () => void;
@@ -12,7 +11,6 @@ interface AddFriendUserProps {
 }
 
 export const AddFriendUser: FC<AddFriendUserProps> = ({
-  children,
   displayName,
   email,
   photoURL,
@@ -27,7 +25,7 @@ export const AddFriendUser: FC<AddFriendUserProps> = ({
     setClicked(true);
   }
   return (
-    <div className="w-full p-5 flex items-center gap-5 border-solid border-2 border-gray-300 rounded-3xl">
+    <div className="w-[50%] min-w-[450px] p-5 flex items-center gap-5 border-solid border-2 border-gray-300 rounded-3xl">
       <div
         className={`${styles.profilePhoto}`}
         style={{
@@ -46,11 +44,11 @@ export const AddFriendUser: FC<AddFriendUserProps> = ({
         <p className={`text-gray-400`}>{email}</p>
       </div>
       {
-        clicked ? <p className="mr-20 border-2 p-3 rounded-md ml-6 ">
+        clicked ? <p className="border-2 p-3 rounded-md ">
           request sent
         </p>:
         <button
-          className="mr-20 border-2 p-3 rounded-md hover:border-indigo-600 hover:text-indigo-600 transition-all duration-300 ml-6 "
+          className="border-2 p-3 rounded-md hover:border-indigo-600 hover:text-indigo-600 transition-all duration-300 "
           onClick={handleClick}
         >
           Add friend
