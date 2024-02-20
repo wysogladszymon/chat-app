@@ -4,7 +4,7 @@ import { FC, ReactNode } from "react";
 interface MessageProps {
   children?: ReactNode;
   my: boolean;
-  date: Date;
+  date: Date | null;
 }
 
 export const Message: FC<MessageProps> = ({ children, my, date }) => {

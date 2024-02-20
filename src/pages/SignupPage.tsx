@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import { Signup } from "../components";
 import { useThemeContext } from "../store/ThemeContext";
 import { ToggleThemeButton } from "../components";
@@ -12,12 +12,10 @@ import { auth, googleProvider, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
 import { doc, setDoc } from "firebase/firestore";
-
 interface SignupPageProps {
-  children?: ReactNode;
 }
 
-export const SignupPage: FC<SignupPageProps> = ({ children }) => {
+export const SignupPage: FC<SignupPageProps> = () => {
   const { theme } = useThemeContext();
   const [error, setError] = useState<string>("");
   const nav = useNavigate();
@@ -36,7 +34,7 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
     try {
       setError("");
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      const user = await updateProfile(res.user, {
+      await updateProfile(res.user, {
         displayName: username,
       });
       setCurrentUser({
@@ -60,7 +58,7 @@ export const SignupPage: FC<SignupPageProps> = ({ children }) => {
   };
 
   const googlesignup = async () => {
-    const res = await signInWithPopup(auth, googleProvider).then(
+    await signInWithPopup(auth, googleProvider).then(
       async (userCredential) => {
         const userdata = userCredential.user;
         console.log("Registered succesfully: ", userdata);

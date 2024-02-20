@@ -1,13 +1,18 @@
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 
-export function getChatID(id: string, id2: string): string {
-  // ids have 28 digits
-  return id > id2 ? id + id2 : id2 + id;
-}
 
 export async function createChat(id: string, id2: string): Promise<void> {
-  const chatid = getChatID(id, id2);
-  await setDoc(doc(db, "chats", chatid), { messages: [] });
+  const usersRef = doc(db, "users", id);
+  const usersRef2 = doc(db, "users", id2);
+  const snap = await getDoc(usersRef);
+  const snap2 = await getDoc(usersRef2);
+
+  if (snap.exists() && snap2.exists()) {
+    const userData = snap.data();
+    const userData2 = snap2.data();
+    await setDoc(doc(db, id, id2), { messages: [], user: userData2, lastmsg: {date: null, content: '', uid: ''}});
+    await setDoc(doc(db, id2, id), { messages: [], user: userData , lastmsg: {date: null, content: '', uid: ''}});
+  }
 }
 

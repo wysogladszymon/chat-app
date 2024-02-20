@@ -4,13 +4,14 @@ import { GoFileMedia } from "react-icons/go";
 import styles from "./Messages.module.css";
 interface MessagesProps {
   children?: ReactNode;
+  name: string
 }
 
-export const Messages: FC<MessagesProps> = ({ children }) => {
+export const Messages: FC<MessagesProps> = ({ children, name }) => {
   return (
     <div className="w-full h-full bg-gray-100 flex flex-col ">
       <div className="flex border-b p-5 items-center">
-        <h1 className="text-2xl text-gray-700 ml-20"> Chat Name</h1>
+        <h1 className="text-2xl text-gray-700 ml-20"> {name}</h1>
       </div>
       <div className={`${styles.scroll} grow flex flex-col-reverse justify-self-end`}>
         {children}

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useAuthContext } from "../../store/AuthContext";
 import { Logout } from "../";
 import styles from "./UserData.module.css";
@@ -9,10 +9,9 @@ import { updateProfile } from "firebase/auth";
 import pic from "../../assets/defaultPicture.png";
 
 interface UserDataProps {
-  children?: ReactNode;
 }
 
-export const UserData: FC<UserDataProps> = ({ children }) => {
+export const UserData: FC<UserDataProps> = () => {
   const { currentUser } = useAuthContext();
   const [photo, setPhoto] = useState<string | undefined | null>(undefined);
   const { theme } = useThemeContext();

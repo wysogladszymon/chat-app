@@ -5,17 +5,18 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { myUser } from "./AuthContext";
 import { FC } from "react";
+import { User } from "../components";
+import { message } from "../components";
 
 interface useReducerStateInterface {
-  chat: myUser;
+  chat: {user: User, messages: message[] } | null | undefined;
   addFriend: boolean;
   friendRequest: boolean;
 }
 interface useReducerActionInterface {
   type: string;
-  payload: myUser;
+  payload: {user: User, messages: message[] }| null | undefined;
 }
 
 interface ActiveContextInterface {
