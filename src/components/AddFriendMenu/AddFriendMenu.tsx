@@ -14,6 +14,7 @@ import {
 import {} from "firebase/firestore";
 import { AddFriendUser } from "../AddFriendUser";
 import { useAuthContext } from "../../store/AuthContext";
+import { getChatID } from "../../store/chatFunctions";
 
 type fetchedUser = {
   email: string;
@@ -54,10 +55,18 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
   };
 
   const handleClick = async (id: string) => {
+    if (!currentUser) return;
     try {
+      //see if the chat already exists
+      const combinedID = getChatID(id, currentUser.uid);
+      const chatDoc = await getDoc(doc(db, "chats", combinedID));
+      if (chatDoc.exists()) {
+        console.log("Chat already exists");
+        return;
+      }
       const docRef = doc(db, "friendrequests", id);
       const docSnap = await getDoc(docRef);
-
+      // if doesnt exist - create one
       if (!docSnap.exists()) {
         await setDoc(docRef, {
           users: [
@@ -66,50 +75,34 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
               displayName: currentUser?.displayName,
               photoURL: currentUser?.photoURL,
               uid: currentUser?.uid,
-            } ,
-          ] as fetchedUser[],
-        });
-      } else {
-        const ans = await checkExistance(id);
-        if (ans) return;
-        const userData = docSnap.data();
-        await updateDoc(docRef, {
-          users: [
-            ...userData.users,
-            {
-              email: currentUser?.email,
-              displayName: currentUser?.displayName,
-              photoURL: currentUser?.photoURL,
-              uid: currentUser?.uid,
             },
           ] as fetchedUser[],
         });
+        // if exist - update one
+      } else {
+        const userData: any[] = docSnap.data().users;
+        // add new request
+        if (!currentUser) return;
+        userData.push({
+          email: currentUser?.email,
+          displayName: currentUser?.displayName,
+          photoURL: currentUser?.photoURL,
+          uid: currentUser?.uid,
+        });
+        //remove the duplicates
+        const uniqueData = userData.filter(
+          (user, index, self) =>
+            index === self.findIndex((t) => t.uid === user.uid)
+        );
+        await updateDoc(docRef, {
+          users: [...uniqueData],
+        });
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const checkExistance = async (id: string) => {
-    try {
-      const docRef = doc(db, "friendrequests", id);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const userData = docSnap.data();
-
-        if (userData && userData.users) {
-          const data : fetchedUser[] = userData.users;
-          const ans = data.some((i) => i.uid === currentUser?.uid);
-          return ans;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  };
   return (
     <div className="w-full h-full bg-gray-100 flex flex-col p-10 ">
       <h1 className="text-3xl pl-3">Add Friend</h1>
