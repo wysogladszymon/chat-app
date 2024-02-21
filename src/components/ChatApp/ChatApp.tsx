@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from "react";
+import debounce from "lodash/debounce";
 import {
   ToggleThemeButton,
   AddFriend,
@@ -12,17 +13,11 @@ import {
   Welcome,
   FriendRequestUser,
 } from "../";
-import {
-  doc,
-  onSnapshot,
-  updateDoc,
-  collection,
-  query,
-} from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { useActiveContext } from "../../store/ActiveContext";
 import { useAuthContext } from "../../store/AuthContext";
 import { db } from "../../config/firebase";
-import { createChat } from "../../store/chatFunctions";
+import { getChatID } from "../../store/chatFunctions";
 
 interface ChatAppProps {}
 export interface User {
@@ -40,7 +35,6 @@ export interface message {
   uid: string;
 }
 export interface inboxInterface {
-  messages: message[];
   lastmsg: message;
   user: User;
 }
@@ -49,6 +43,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
   const [inbox, setInbox] = useState<inboxInterface[]>([]);
   const [friendRequests, setFriendRequests] = useState<friendRequest[]>([]);
   const { currentUser } = useAuthContext();
+
   const handleFriendReq = () => {
     dispatchActive({ type: "FRIEND_REQUEST", payload: null });
   };
@@ -66,62 +61,110 @@ export const ChatApp: FC<ChatAppProps> = () => {
     });
     setFriendRequests(users);
   };
+
   const handleacceptance = async (us: friendRequest) => {
-    if (!currentUser) return;
-    createChat(us.uid, currentUser.uid);
-    handledecline(us.uid);
-    dispatchActive({ type: "CHAT", payload: {user: us, messages:[]} });
+    // if (!currentUser) return;
+
+    // const combinedID = getChatID(currentUser.uid, us.uid);
+    // const docum = (await getDoc(doc(db, "chats", combinedID))).exists();
+    // // if (docum) return;
+
+    // //creates chat
+    // await setDoc(doc(db, "chats", combinedID), { messages: [] });
+    // //creates userchat
+
+    // const doc1 = await getDoc(doc(db, "userChats", currentUser.uid));
+    // const doc2 = await getDoc(doc(db, "userChats", us.uid));
+
+    // if (!doc1.exists()) 
+    //   await setDoc(doc(db, "userChats", currentUser.uid), { messages: [] });
+    // const mss = doc1.data().messages;
+    // mss.push({user: {
+    //   uid: us.uid,
+    //   email: us.email,
+    //   displayName: us.displayName,
+    //   photoURL: us.photoURL,
+    // },lastmsg: {
+    //   content: "",
+    //   date: null,
+    //   uid: "",
+    // }});
+    //   await updateDoc(doc(db, "userChats", currentUser.uid), {
+    //   messages:mss
+    // });
+
+    // if (!doc2.exists()) 
+    //   await setDoc(doc(db, "userChats", us.uid), { messages: [] });
+    //   const mss2 = doc2.data().messages;
+    //   mss2.push({user: {
+    //     uid: us.uid,
+    //     email: us.email,
+    //     displayName: us.displayName,
+    //     photoURL: us.photoURL,
+    //   },lastmsg: {
+    //     content: "",
+    //     date: null,
+    //     uid: "",
+    //   }});
+    //     await updateDoc(doc(db, "userChats", currentUser.uid), {
+    //     messages:mss
+    //   });
+    // dispatchActive({ type: "CHAT", payload: { user: us, messages: [] } });
+    // handledecline(us.uid);
   };
-  const handleClick = (u : inboxInterface) => {
+
+  const handleClick = (u: inboxInterface) => {
     if (!currentUser) return;
-    dispatchActive({type: "CHAT", payload: {user: u.user, messages:u.messages} })
-  }
+    const combinedID = getChatID(currentUser.uid, u.user.uid);
+
+    dispatchActive({ type: "CHAT", payload: { user: u.user, messages: [] } });
+  };
   useEffect(() => {
-    const f = async () => {
-      const unsub =
-        currentUser &&
-        onSnapshot(doc(db, "friendrequests", currentUser.uid), (doc) => {
+    const fetchFriendRequests = async () => {
+      if (!currentUser || !currentUser.uid) return;
+
+      const friendRequestsUnsub = onSnapshot(
+        doc(db, "friendrequests", currentUser.uid),
+        (doc) => {
           setFriendRequests((doc.data()?.users as friendRequest[]) || []);
-        });
-      if (unsub) return () => unsub();
+        }
+      );
+
+      return () => friendRequestsUnsub();
     };
 
-    currentUser && currentUser.uid && f();
+    const fetchUserChats = async () => {
+      if (!currentUser || !currentUser.uid) return;
 
-    const g = async () => {
-      if (currentUser) {
-        const q = query(collection(db, currentUser.uid));
-        const inb: inboxInterface[] = [];
-        const unsub =
-          currentUser &&
-          onSnapshot(q, (querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              const inter: inboxInterface = {
-                messages: doc.data().messages,
-                lastmsg: doc.data().lastmsg,
-                user: doc.data().user,
-              };
-              inb.push(inter);
-            });
-            inb.sort((a, b) => {
-              if (a.lastmsg.date === null && b.lastmsg.date === null) {
-                  return 0; 
-              } else if (a.lastmsg.date === null) {
-                  return 1; 
-              } else if (b.lastmsg.date === null) {
-                  return -1;
-              } else {
-                  if (a.lastmsg.date < b.lastmsg.date) return -1;
-                  if (a.lastmsg.date > b.lastmsg.date) return 1;
-                  return 0;
-              }
-          });
-            setInbox(inb);
-          });
-        if (unsub) return () => unsub();
-      }
+      const userChatsUnsub = onSnapshot(
+        doc(db, "userChats", currentUser.uid),
+        (doc) => {
+          if (doc && doc.data()) {
+            console.log(Object.entries(doc.data().messages.entries));
+          }
+        }
+      );
+
+      return () => userChatsUnsub();
     };
-    currentUser && currentUser.uid && g();
+    const DEBOUNCE_DELAY = 2000;
+    const debouncedFetchFriendRequests = debounce(
+      fetchFriendRequests,
+      DEBOUNCE_DELAY
+    );
+    const debouncedFetchUserChats = debounce(fetchUserChats, DEBOUNCE_DELAY);
+
+    const fetchAllData = async () => {
+      await debouncedFetchFriendRequests();
+      await debouncedFetchUserChats();
+    };
+
+    currentUser?.uid && fetchAllData();
+
+    return () => {
+      debouncedFetchFriendRequests.cancel();
+      debouncedFetchUserChats.cancel();
+    };
   }, [currentUser?.uid, handleacceptance]);
 
   return (
@@ -142,10 +185,10 @@ export const ChatApp: FC<ChatAppProps> = () => {
         <div className={` grow flex flex-col justify-self-end overflow-auto`}>
           {inbox.map((u) => (
             <ChatInfo
-            onClick={() => handleClick(u)}
+              onClick={() => handleClick(u)}
               key={u.user.uid}
               lastmsg={u.lastmsg.content}
-              date={u.lastmsg.date}
+              date={new Date()}
               picURL={u.user.photoURL}
               name={u.user.displayName}
             />
@@ -157,7 +200,15 @@ export const ChatApp: FC<ChatAppProps> = () => {
       <div className="w-full h-full bg-gray-100 flex flex-col ">
         {activeState.chat && (
           <Messages name={activeState.chat.user.displayName}>
-            {activeState.chat.messages.map((msg)=><Message my={currentUser?.uid === msg.uid} date={msg.date}/>)}
+            {activeState.chat.messages.map((msg, index) => (
+              <Message
+                my={currentUser?.uid === msg.uid}
+                key={index}
+                date={new Date()}
+              >
+                {msg.content}
+              </Message>
+            ))}
           </Messages>
         )}
         {activeState.addFriend && <AddFriendMenu />}

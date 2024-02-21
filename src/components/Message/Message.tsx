@@ -10,6 +10,7 @@ interface MessageProps {
 export const Message: FC<MessageProps> = ({ children, my, date }) => {
   const clsColor = my ? "bg-blue-200" :  "bg-gray-300 ";
   const cls = my ? "ml-auto mr-16" : "ml-16 mr-auto";
+  
   return (
     <div className={`${cls} mt-3 mb-3`}>
       <p

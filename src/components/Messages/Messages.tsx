@@ -1,19 +1,32 @@
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 import { LuSend } from "react-icons/lu";
 import { GoFileMedia } from "react-icons/go";
 import styles from "./Messages.module.css";
+import { useAuthContext } from "../../store/AuthContext";
+import { useActiveContext } from "../../store/ActiveContext";
+
 interface MessagesProps {
   children?: ReactNode;
-  name: string
+  name: string;
 }
 
 export const Messages: FC<MessagesProps> = ({ children, name }) => {
+  const [message, setMessage] = useState<string>("");
+  const { currentUser } = useAuthContext();
+  const { activeState, dispatchActive } = useActiveContext();
+
+  const sendMessage = async () => {
+    
+    setMessage("");
+  };
   return (
     <div className="w-full h-full bg-gray-100 flex flex-col ">
       <div className="flex border-b p-5 items-center">
         <h1 className="text-2xl text-gray-700 ml-20"> {name}</h1>
       </div>
-      <div className={`${styles.scroll} grow flex flex-col-reverse justify-self-end`}>
+      <div
+        className={`${styles.scroll} grow flex flex-col-reverse justify-self-end`}
+      >
         {children}
       </div>
       <div className="flex max-h-32 p-5 border items-center justify-center">
@@ -29,11 +42,14 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
           />
         </div>
         <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           className="h-full outline-none p-5 grow rounded-2xl text-wrap"
           placeholder="write a message..."
         />
         <button className="h-10 w-10 mr-5 ml-5">
           <LuSend
+            onClick={sendMessage}
             size={"40px"}
             className="cursor-pointer border p-2 bg-gray-200 rounded-full"
           />
