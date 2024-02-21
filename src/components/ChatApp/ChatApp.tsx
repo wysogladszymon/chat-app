@@ -239,7 +239,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
       };
       const fetchCurrentMessages = () => {
         //if chat is not active - do nothing
-        if (!activeState.chat) return;
+        if (!activeState.chat || !activeState.chat.user) return;
 
         //get chatRef
         const combinedID = getChatID(
@@ -268,7 +268,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                 if (activeState.chat?.messages !== data)
                   dispatchActive({
                     type: "CHAT",
-                    payload: { user: activeState.chat.user, messages: data },
+                    payload: { user: null, messages: data },
                   });
               } else {
                 console.log("No chat data available");
@@ -340,7 +340,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
         {/* current Chat */}
         <div className="w-full h-full bg-gray-100 flex flex-col ">
           {activeState.chat && (
-            <Messages name={activeState.chat.user.displayName}>
+            <Messages name={activeState.chat.user ? activeState.chat.user.displayName : ''}>
               {activeState.chat.messages.map((msg, index) => (
                 <Message
                   my={currentUser?.uid === msg.uid}

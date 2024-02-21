@@ -1,6 +1,7 @@
 import {
   Dispatch,
   ReactNode,
+  Reducer,
   createContext,
   useContext,
   useReducer,
@@ -10,13 +11,13 @@ import { User } from "../components";
 import { message } from "../components";
 
 interface useReducerStateInterface {
-  chat: {user: User, messages: message[] } | null | undefined;
+  chat: {user: User | null, messages: message[] } | null | undefined;
   addFriend: boolean;
   friendRequest: boolean;
 }
 interface useReducerActionInterface {
   type: string;
-  payload: {user: User, messages: message[] }| null | undefined;
+  payload: {user: User | null, messages: message[] } | null | undefined;
 }
 
 interface ActiveContextInterface {
@@ -47,11 +48,21 @@ const activeReducer = (
         friendRequest: true,
       };
     case "CHAT":
-      return {
+      if (!action.payload) return state;
+      return action.payload.user === null ? 
+      {
+        addFriend: false,
+        friendRequest: false,
+        chat: {
+          user: state.chat ? state.chat.user : null,
+          messages: action.payload.messages
+        },
+      } : 
+      {
         addFriend: false,
         friendRequest: false,
         chat: action.payload,
-      };
+      }
     default:
       return state;
   }
@@ -63,7 +74,7 @@ interface ActiveContextProviderProps {
 export const ActiveContextProvider: FC<ActiveContextProviderProps> = ({
   children,
 }) => {
-  const [activeState, dispatchActive] = useReducer(activeReducer, {
+  const [activeState, dispatchActive] = useReducer<Reducer<useReducerStateInterface, useReducerActionInterface>>(activeReducer, {
     chat: null,
     addFriend: false,
     friendRequest: false,
