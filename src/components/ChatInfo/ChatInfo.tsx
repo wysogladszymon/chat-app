@@ -8,6 +8,7 @@ interface ChatInfoProps {
   lastmsg: string;
   picURL: string;
   onClick: () => void;
+  my: boolean
 }
 
 export const ChatInfo: FC<ChatInfoProps> = ({
@@ -16,6 +17,7 @@ export const ChatInfo: FC<ChatInfoProps> = ({
   name,
   picURL,
   onClick,
+  my
 }) => {
   picURL = picURL || pic;
   console.log();
@@ -39,7 +41,10 @@ export const ChatInfo: FC<ChatInfoProps> = ({
       </div>
       <div className="ml-5 grow overflow-hidden">
         <h1 className="font-medium text-xl">{name}</h1>
-        <p className="overflow-hidden max-w-[277px]">{lastmsg}</p>
+        <div className='flex'>
+        {my && <p className='mr-1 text-sm text-gray-500'>You: </p>}
+        <p className="overflow-hidden text-sm max-w-[277px] text-gray-500">{lastmsg}</p>
+        </div>
       </div>
       <p className="text-sm flex flex-col items-center text-gray-500">
         <span>{date && date.split(" ")[1]}</span>

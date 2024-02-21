@@ -354,11 +354,13 @@ export const ChatApp: FC<ChatAppProps> = () => {
           <div className={` grow flex flex-col justify-self-end overflow-auto`}>
             {inbox.map((u) => (
               <ChatInfo
+              my={u.lastmsg.uid === currentUser.uid}
                 onClick={() => chatInfoClick(u)}
                 key={u.user.uid}
                 lastmsg={u.lastmsg.content}
                 date={
-                  formatDate(new Date(u.lastmsg.date))
+                  u.lastmsg.date ? 
+                  formatDate(new Date(u.lastmsg.date)): ''
                 }
                 picURL={u.user.photoURL}
                 name={u.user.displayName}
