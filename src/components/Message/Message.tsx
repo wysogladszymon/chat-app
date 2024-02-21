@@ -4,7 +4,7 @@ import { FC, ReactNode } from "react";
 interface MessageProps {
   children?: ReactNode;
   my: boolean;
-  date: Date | null;
+  date: string;
 }
 
 export const Message: FC<MessageProps> = ({ children, my, date }) => {
@@ -19,11 +19,8 @@ export const Message: FC<MessageProps> = ({ children, my, date }) => {
       >
         {children}
       </p>
-      <p className={`text-xs mt-1 text-gray-400`}>
-        {date &&
-          `${(0+ date.getHours().toString()).slice(-2)}:${(0+date.getMinutes().toString()).slice(-2)} ${(0 + date.getDate().toString()).slice(-2)}.${(
-            0 + (date.getMonth() + 1).toString()
-          ).slice(-2)}.${date.getFullYear().toString()}`}
+      <p className={`text-xs mt-1 text-gray-400 ${my ?"text-end" : "text-start"}`}>
+        {date}
       </p>
     </div>
   );

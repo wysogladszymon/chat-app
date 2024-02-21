@@ -1,8 +1,9 @@
 import { FC } from "react";
 import styles from "./ChatInfo.module.css";
+import pic from "../../assets/defaultPicture.png"
 
 interface ChatInfoProps {
-  date: Date | null;
+  date: string;
   name: string;
   lastmsg: string;
   picURL: string;
@@ -14,10 +15,15 @@ export const ChatInfo: FC<ChatInfoProps> = ({
   lastmsg,
   name,
   picURL,
-  onClick
+  onClick,
 }) => {
+  picURL = picURL || pic;
+  console.log();
   return (
-    <div className="w-full border p-5 flex items-center gap-5 cursor-pointer hover:bg-gray-100" onClick={onClick}>
+    <div
+      className="w-full border p-5 flex items-center gap-5 cursor-pointer hover:bg-gray-100"
+      onClick={onClick}
+    >
       <div
         className={`${styles.profilePhoto}`}
         style={{
@@ -36,15 +42,8 @@ export const ChatInfo: FC<ChatInfoProps> = ({
         <p className="overflow-hidden max-w-[277px]">{lastmsg}</p>
       </div>
       <p className="text-sm flex flex-col items-center text-gray-500">
-        {date &&
-          `${(0 + date.getDate().toString()).slice(-2)}.${(
-            0 + (date.getMonth() + 1).toString()
-          ).slice(-2)}.${date.getFullYear().toString()} \n ${(0 + date.getHours().toString()).slice(-2)}:${(
-            0 + date.getMinutes().toString()
-          ).slice(-2)}`.split('\n').map((line, index) => {
-            return <span key={index}>{line}
-            <br /></span>
-          })}
+        <span>{date && date.split(" ")[1]}</span>
+        <span>{date && date.split(" ")[0]}</span>
       </p>
     </div>
   );

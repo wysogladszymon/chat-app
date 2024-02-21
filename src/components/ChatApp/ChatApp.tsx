@@ -18,6 +18,9 @@ import { useActiveContext } from "../../store/ActiveContext";
 import { useAuthContext } from "../../store/AuthContext";
 import { db } from "../../config/firebase";
 import { getChatID } from "../../store/chatFunctions";
+import { formatDate } from "../../store/dateManagement";
+
+const DEBOUNCE_DELAY = 0;
 
 interface ChatAppProps {}
 export interface User {
@@ -30,7 +33,7 @@ export interface friendRequest extends User {
   displayNameLower: string;
 }
 export interface message {
-  date: Date | null;
+  date: string;
   content: string;
   uid: string;
 }
@@ -44,12 +47,15 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const { activeState, dispatchActive } = useActiveContext();
     const [inbox, setInbox] = useState<inboxInterface[]>([]);
     const [friendRequests, setFriendRequests] = useState<friendRequest[]>([]);
+    const [messages, setMessages] = useState<message[]>([]);
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
+      setMessages([]);
     };
     const handleAddFriend = () => {
       dispatchActive({ type: "ADD_FRIEND", payload: null });
+      setMessages([]);
     };
 
     const handledecline = async (id: string) => {
@@ -164,6 +170,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     };
 
     const chatInfoClick = async (u: inboxInterface) => {
+      if (u.user !== activeState.chat?.user) setMessages([]);
       try {
         // get messages
         const combinedID = getChatID(currentUser.uid, u.user.uid);
@@ -188,17 +195,39 @@ export const ChatApp: FC<ChatAppProps> = () => {
     };
     useEffect(() => {
       const fetchFriendRequests = async () => {
-        const friendRequestsUnsub = onSnapshot(
-          doc(db, "friendrequests", currentUser.uid),
-          (doc) => {
-            const requests = doc.data()?.users as friendRequest[];
-            if (requests !== friendRequests) setFriendRequests(requests);
-          }
-        );
+        const requestsRef = doc(db, "friendrequests", currentUser.uid);
+        try {
+          const reqUnsub = onSnapshot(
+            requestsRef,
+            (docSnapshot) => {
+              if (docSnapshot.exists()) {
+                const reqData = docSnapshot.data();
+                console.log("requests:", reqData);
 
-        return () => friendRequestsUnsub();
+                const data = reqData.users.map((el: friendRequest) => {
+                  return {
+                    displayName: el.displayName,
+                    email: el.email,
+                    uid: el.uid,
+                    photoURL: el.photoURL,
+                    displayNameLower: el.displayNameLower
+                  };
+                });
+                setFriendRequests(data);
+              } else {
+                console.log("No request data available");
+              }
+            },
+            (error: any) => {
+              console.error("Error fetching user chats:", error);
+            }
+          );
+
+          return () => reqUnsub();
+        } catch (error) {
+          console.error("Error setting up user chats listener:", error);
+        }
       };
-
       const fetchUserChats = async () => {
         const userChatsRef = doc(db, "userChats", currentUser.uid);
         try {
@@ -207,7 +236,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
             (docSnapshot) => {
               if (docSnapshot.exists()) {
                 const chatData = docSnapshot.data();
-                const data = chatData.chats.map((el: inboxInterface) => {
+                const data :inboxInterface[] = chatData.chats.map((el: inboxInterface) => {
                   return {
                     user: {
                       email: el.user.email,
@@ -222,7 +251,8 @@ export const ChatApp: FC<ChatAppProps> = () => {
                     },
                   };
                 });
-                if (inbox !== data) setInbox(data);
+                data.sort((a,b) => (new Date(b.lastmsg.date)).getTime() - (new Date(a.lastmsg.date)).getTime())
+                setInbox(data);
               } else {
                 console.log("No chat data available");
               }
@@ -239,7 +269,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
       };
       const fetchCurrentMessages = () => {
         //if chat is not active - do nothing
-        if (!activeState.chat || !activeState.chat.user) return;
+        if (!activeState.chat) return;
 
         //get chatRef
         const combinedID = getChatID(
@@ -254,7 +284,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
             (docSnapshot) => {
               if (docSnapshot.exists()) {
                 const chatData = docSnapshot.data();
-                // console.log(chatData.messages);
 
                 const data = chatData.messages.map((msg: message) => {
                   return {
@@ -264,12 +293,11 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   };
                 });
                 if (!activeState.chat || !activeState.chat.user) return;
-
-                if (activeState.chat?.messages !== data)
-                  dispatchActive({
-                    type: "CHAT",
-                    payload: { user: null, messages: data },
-                  });
+                if (
+                  getChatID(currentUser.uid, activeState.chat.user.uid) ===
+                  combinedID
+                )
+                  setMessages(data);
               } else {
                 console.log("No chat data available");
               }
@@ -284,7 +312,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
           console.error("Error setting up user chats listener:", error);
         }
       };
-      const DEBOUNCE_DELAY = 2000;
       const debouncedFetchFriendRequests = debounce(
         fetchFriendRequests,
         DEBOUNCE_DELAY
@@ -302,11 +329,12 @@ export const ChatApp: FC<ChatAppProps> = () => {
 
       currentUser?.uid && fetchAllData();
 
+      console.log('1')
       return () => {
         debouncedFetchFriendRequests.cancel();
         debouncedFetchUserChats.cancel();
       };
-    }, [currentUser?.uid, handleacceptance]);
+    }, [currentUser, activeState]);
 
     return (
       <div className=" h-screen flex justify-center items-center w-screen">
@@ -319,7 +347,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
             <AddFriend onClick={handleAddFriend} />
             <FriendRequests
               onClick={handleFriendReq}
-              count={friendRequests.length}
+              count={friendRequests ? friendRequests.length : 0}
             />
           </div>
           <p className="p-4 text-gray-400 text-sm">chats</p>
@@ -329,7 +357,9 @@ export const ChatApp: FC<ChatAppProps> = () => {
                 onClick={() => chatInfoClick(u)}
                 key={u.user.uid}
                 lastmsg={u.lastmsg.content}
-                date={u.lastmsg.date}
+                date={
+                  formatDate(new Date(u.lastmsg.date))
+                }
                 picURL={u.user.photoURL}
                 name={u.user.displayName}
               />
@@ -340,12 +370,17 @@ export const ChatApp: FC<ChatAppProps> = () => {
         {/* current Chat */}
         <div className="w-full h-full bg-gray-100 flex flex-col ">
           {activeState.chat && (
-            <Messages name={activeState.chat.user ? activeState.chat.user.displayName : ''}>
-              {activeState.chat.messages.map((msg, index) => (
+            <Messages
+              name={
+                activeState.chat.user ? activeState.chat.user.displayName : ""
+              }
+            >
+              {messages.map((msg, index) => (
                 <Message
                   my={currentUser?.uid === msg.uid}
                   key={index}
-                  date={new Date()}
+                  date={formatDate(new Date(msg.date))}
+                  
                 >
                   {msg.content}
                 </Message>
