@@ -2,6 +2,7 @@ import { FC } from "react";
 import styles from "./FriendRequestUser.module.css";
 import pic from "../../assets/defaultPicture.png";
 import { TiTick } from "react-icons/ti";
+import { useThemeContext } from "../../store/ThemeContext";
 
 interface FriendRequestUserProps {
   displayName: string;
@@ -19,9 +20,9 @@ export const FriendRequestUser: FC<FriendRequestUserProps> = ({
   accept,
 }) => {
   if (!photoURL) photoURL = pic;
-
+  const {theme} = useThemeContext();
   return (
-    <div className="w-[50%] min-w-[450px] p-5 flex items-center gap-5 border-solid border-2 border-gray-300 rounded-3xl">
+    <div className={`w-[50%] min-w-[450px] p-5 flex items-center gap-5 ${!theme ? 'text-gray-500 border-2 border-gray-200' : 'text-gray-200 border-2 border-gray-500'}  border-gray-300 rounded-3xl`}>
       <div
         className={`${styles.profilePhoto}`}
         style={{
@@ -37,13 +38,14 @@ export const FriendRequestUser: FC<FriendRequestUserProps> = ({
       </div>
       <div className="ml-5 grow overflow-hidden flex-col flex">
         <h1 className="font-medium text-xl">{displayName}</h1>
-        <p className={`text-gray-400`}>{email}</p>
+        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'}`}>{email}</p>
       </div>
       <div className="flex gap-2">
         <TiTick
+        color={'black'}
           onClick={accept}
           size={"30px"}
-          className={`cursor-pointer bg-green-500 p-[2px] rounded-full border`}
+          className={`cursor-pointer bg-green-500 p-[2px] rounded-full `}
         ></TiTick>
         <button
           onClick={decline}

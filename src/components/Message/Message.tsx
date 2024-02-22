@@ -1,4 +1,5 @@
 import { FC, ReactNode } from "react";
+import { useThemeContext } from "../../store/ThemeContext";
 // import styles from "./Message.module.css";
 
 interface MessageProps {
@@ -8,7 +9,8 @@ interface MessageProps {
 }
 
 export const Message: FC<MessageProps> = ({ children, my, date }) => {
-  const clsColor = my ? "bg-blue-200" :  "bg-gray-300 ";
+  const {theme} = useThemeContext();
+  const clsColor = my ? (!theme ? "bg-blue-200" : 'bg-blue-600') :  (theme ? "bg-gray-600" : 'bg-gray-300');
   const cls = my ? "ml-auto mr-16" : "ml-16 mr-auto";
   
   return (
@@ -19,7 +21,7 @@ export const Message: FC<MessageProps> = ({ children, my, date }) => {
       >
         {children}
       </p>
-      <p className={`text-xs mt-1 text-gray-400 ${my ?"text-end" : "text-start"}`}>
+      <p className={`${theme ? 'text-gray-100':'text-gray-400'} text-xs mt-1 ${my ?"text-end" : "text-start"}`}>
         {date}
       </p>
     </div>

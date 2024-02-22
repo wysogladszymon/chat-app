@@ -8,8 +8,9 @@ interface WelcomeProps {
 export const Welcome: FC<WelcomeProps> = ({ children }) => {
   return (
     <div className="self-center mt-52 text-6xl flex items-center flex-col gap-10">
-      <h1>Welcome in our Chat App</h1>
-      <FaRegSmileBeam size={"300px"} className={styles.customSpin}/>
+      <h1>Welcome in our Chat App!</h1>
+      <p className='text-2xl'>Please, choose a chat.</p>
+      {/* <FaRegSmileBeam size={"300px"} className={styles.customSpin}/> */}
     </div>
   );
 };

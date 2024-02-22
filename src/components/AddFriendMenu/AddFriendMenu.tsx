@@ -106,10 +106,10 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
     };
 
     return (
-      <div className="w-full h-full bg-gray-100 flex flex-col p-10 ">
+      <div className="w-full h-full flex flex-col p-10 ">
         <h1 className="text-3xl pl-3">Add Friend</h1>
         <input
-          className={`outline-none mt-4 p-4 rounded-2xl mb-10 w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
+          className={`text-gray-700 outline-none mt-4 p-4 rounded-2xl mb-10 w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
           type="text"
           placeholder="search for a friend..."
           value={user}

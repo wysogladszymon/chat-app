@@ -8,6 +8,7 @@ import { getChatID } from "../../store/chatFunctions";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { User, message } from "../ChatApp";
+import { useThemeContext } from "../../store/ThemeContext";
 
 interface MessagesProps {
   children?: ReactNode;
@@ -18,6 +19,8 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
   const { currentUser } = useAuthContext();
   const { activeState } = useActiveContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const {theme} = useThemeContext();
   if (currentUser && activeState.chat) {
     const [message, setMessage] = useState<string>("");
     const sendMessage = async () => {
@@ -92,15 +95,15 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
       }
     }, [children]);
     return (
-      <div className="w-full h-full bg-gray-100 flex flex-col ">
-        <div className="flex border-b p-5 items-center">
-          <h1 className="text-2xl text-gray-700 ml-20"> {name}</h1>
+      <div className="w-full h-full flex flex-col ">
+        <div className={`flex ${theme ? 'border-b-gray-700 border-b-4': "border-b-4"} p-5 items-center`}>
+          <h1 className={`text-2xl ${theme ? 'text-gray-200' : 'text-gray-800'} ml-20`}> {name}</h1>
         </div>
         <div className={`${styles.scroll} grow flex flex-col justify-self-end`}>
           {children}
           <div ref={messagesEndRef} />
         </div>
-        <div className="flex max-h-32 p-5 border items-center justify-center">
+        <div className={`flex max-h-32 p-5  items-center justify-center ${theme ? 'text-gray-200' : 'text-gray-500'}`}>
           <div className="w-10 mr-5">
             <label
               className={`${styles.changePhoto}`}
@@ -118,7 +121,7 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="h-full outline-none p-5 grow rounded-2xl text-wrap"
+            className={`h-full outline-none p-5 grow rounded-2xl text-wrap bg-transparent ${theme ? 'border-gray-700 border-2': "border-2"}`}
             placeholder="write a message..."
           />
           <button className="h-10 w-10 mr-5 ml-5">

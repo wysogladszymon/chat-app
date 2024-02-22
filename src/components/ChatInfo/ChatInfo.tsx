@@ -1,6 +1,7 @@
 import { FC } from "react";
 import styles from "./ChatInfo.module.css";
 import pic from "../../assets/defaultPicture.png"
+import { useThemeContext } from "../../store/ThemeContext";
 
 interface ChatInfoProps {
   date: string;
@@ -8,7 +9,8 @@ interface ChatInfoProps {
   lastmsg: string;
   picURL: string;
   onClick: () => void;
-  my: boolean
+  my: boolean,
+  className?: string
 }
 
 export const ChatInfo: FC<ChatInfoProps> = ({
@@ -17,13 +19,15 @@ export const ChatInfo: FC<ChatInfoProps> = ({
   name,
   picURL,
   onClick,
+  className,
   my
 }) => {
   picURL = picURL || pic;
   console.log();
+  const {theme} = useThemeContext();
   return (
     <div
-      className="w-full border p-5 flex items-center gap-5 cursor-pointer hover:bg-gray-100"
+      className={`${className || ''} ${theme ? 'hoverDarkColor' : 'hoverLightColor'} w-full p-5 flex items-center gap-5 cursor-pointer`}
       onClick={onClick}
     >
       <div
@@ -42,11 +46,11 @@ export const ChatInfo: FC<ChatInfoProps> = ({
       <div className="ml-5 grow overflow-hidden">
         <h1 className="font-medium text-xl">{name}</h1>
         <div className='flex'>
-        {my && <p className='mr-1 text-sm text-gray-500'>You: </p>}
-        <p className="overflow-hidden text-sm max-w-[277px] text-gray-500">{lastmsg}</p>
+        {my && <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} mr-1 text-sm `}>You: </p>}
+        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} overflow-hidden text-sm max-w-[277px]`}>{lastmsg}</p>
         </div>
       </div>
-      <p className="text-sm flex flex-col items-center text-gray-500">
+      <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-sm flex flex-col items-center`}>
         <span>{date && date.split(" ")[1]}</span>
         <span>{date && date.split(" ")[0]}</span>
       </p>

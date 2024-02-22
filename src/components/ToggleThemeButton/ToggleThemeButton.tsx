@@ -17,6 +17,7 @@ export const ToggleThemeButton: FC<ToggleThemeButtonProps> = ({
     const circ = document.querySelector(`.${styles.circle}`) as HTMLElement;
     
     circ.style.translate = circ.style.translate === "-100%" ? '0px' : "-100%"; 
+    circ.style.backgroundColor = theme ? '#94a3b8' : 'white';
   };
   return (
     <label htmlFor={check} className={` ${button}`}>

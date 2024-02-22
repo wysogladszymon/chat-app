@@ -68,7 +68,7 @@ export const UserData: FC<UserDataProps> = () => {
       </div>
       <div className={`flex flex-col items-center justify-center`}>
         <h1 className={` font-bold text-xl`}>{currentUser?.displayName}</h1>
-        <p className={` text-gray-400`}>{currentUser?.email}</p>
+        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'}`}>{currentUser?.email}</p>
       </div>
       <div className="h-12 w-12 ml-20">
         <Logout />

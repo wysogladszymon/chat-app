@@ -19,6 +19,7 @@ import { useAuthContext } from "../../store/AuthContext";
 import { db } from "../../config/firebase";
 import { getChatID } from "../../store/chatFunctions";
 import { formatDate } from "../../store/dateManagement";
+import { useThemeContext } from "../../store/ThemeContext";
 
 const DEBOUNCE_DELAY = 0;
 
@@ -48,6 +49,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const [inbox, setInbox] = useState<inboxInterface[]>([]);
     const [friendRequests, setFriendRequests] = useState<friendRequest[]>([]);
     const [messages, setMessages] = useState<message[]>([]);
+    const { theme } = useThemeContext();
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
@@ -210,7 +212,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                     email: el.email,
                     uid: el.uid,
                     photoURL: el.photoURL,
-                    displayNameLower: el.displayNameLower
+                    displayNameLower: el.displayNameLower,
                   };
                 });
                 setFriendRequests(data);
@@ -236,22 +238,28 @@ export const ChatApp: FC<ChatAppProps> = () => {
             (docSnapshot) => {
               if (docSnapshot.exists()) {
                 const chatData = docSnapshot.data();
-                const data :inboxInterface[] = chatData.chats.map((el: inboxInterface) => {
-                  return {
-                    user: {
-                      email: el.user.email,
-                      displayName: el.user.displayName,
-                      photoURL: el.user.photoURL,
-                      uid: el.user.uid,
-                    },
-                    lastmsg: {
-                      content: el.lastmsg.content,
-                      date: el.lastmsg.date,
-                      uid: el.lastmsg.uid,
-                    },
-                  };
-                });
-                data.sort((a,b) => (new Date(b.lastmsg.date)).getTime() - (new Date(a.lastmsg.date)).getTime())
+                const data: inboxInterface[] = chatData.chats.map(
+                  (el: inboxInterface) => {
+                    return {
+                      user: {
+                        email: el.user.email,
+                        displayName: el.user.displayName,
+                        photoURL: el.user.photoURL,
+                        uid: el.user.uid,
+                      },
+                      lastmsg: {
+                        content: el.lastmsg.content,
+                        date: el.lastmsg.date,
+                        uid: el.lastmsg.uid,
+                      },
+                    };
+                  }
+                );
+                data.sort(
+                  (a, b) =>
+                    new Date(b.lastmsg.date).getTime() -
+                    new Date(a.lastmsg.date).getTime()
+                );
                 setInbox(data);
               } else {
                 console.log("No chat data available");
@@ -329,7 +337,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
 
       currentUser?.uid && fetchAllData();
 
-      console.log('1')
+      console.log("1");
       return () => {
         debouncedFetchFriendRequests.cancel();
         debouncedFetchUserChats.cancel();
@@ -337,15 +345,39 @@ export const ChatApp: FC<ChatAppProps> = () => {
     }, [currentUser, activeState]);
 
     return (
-      <div className=" h-screen flex justify-center items-center w-screen">
+      <div
+        className={`h-screen flex justify-center items-center w-screen ${
+          theme ? "text-white" : "text-gray-950"
+        }`}
+      >
         {/* sidebar */}
-        <div className="flex flex-col border-r-2 h-full relative pt-5 max-w-[512px]">
+        <div
+          className={`flex flex-col h-full  relative pt-5 max-w-[512px] ${
+            !theme ? "bg-white" : "bg-gray-950"
+          }`}
+        >
           <div className="flex align-center justify-end ">
             <ToggleThemeButton />
           </div>
           <div className="mt-20 ">
-            <AddFriend onClick={handleAddFriend} />
+            <AddFriend
+              className={`${
+                activeState.addFriend
+                  ? theme
+                    ? "activeDarkColor"
+                    : "activeLightColor"
+                  : ""
+              }`}
+              onClick={handleAddFriend}
+            />
             <FriendRequests
+              className={`${
+                activeState.friendRequest
+                  ? theme
+                    ? "activeDarkColor"
+                    : "activeLightColor "
+                  : ""
+              }`}
               onClick={handleFriendReq}
               count={friendRequests ? friendRequests.length : 0}
             />
@@ -354,13 +386,13 @@ export const ChatApp: FC<ChatAppProps> = () => {
           <div className={` grow flex flex-col justify-self-end overflow-auto`}>
             {inbox.map((u) => (
               <ChatInfo
-              my={u.lastmsg.uid === currentUser.uid}
+              className={`${activeState.chat && activeState.chat.user.uid === u.user.uid ? (theme ? 'activeDarkColor': 'activeLightColor') : ''}`}
+                my={u.lastmsg.uid === currentUser.uid}
                 onClick={() => chatInfoClick(u)}
                 key={u.user.uid}
                 lastmsg={u.lastmsg.content}
                 date={
-                  u.lastmsg.date ? 
-                  formatDate(new Date(u.lastmsg.date)): ''
+                  u.lastmsg.date ? formatDate(new Date(u.lastmsg.date)) : ""
                 }
                 picURL={u.user.photoURL}
                 name={u.user.displayName}
@@ -370,7 +402,11 @@ export const ChatApp: FC<ChatAppProps> = () => {
           <UserData />
         </div>
         {/* current Chat */}
-        <div className="w-full h-full bg-gray-100 flex flex-col ">
+        <div
+          className={`w-full h-full flex flex-col ${
+            theme ? "activeDarkColor" : "activeLightColor"
+          }`}
+        >
           {activeState.chat && (
             <Messages
               name={
@@ -382,7 +418,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   my={currentUser?.uid === msg.uid}
                   key={index}
                   date={formatDate(new Date(msg.date))}
-                  
                 >
                   {msg.content}
                 </Message>

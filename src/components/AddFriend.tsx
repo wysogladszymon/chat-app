@@ -4,14 +4,15 @@ import { useThemeContext } from "../store/ThemeContext";
 
 interface AddFriendProps {
   onClick: () => void
+  className?: string
 }
 
-export const AddFriend: FC<AddFriendProps> = ({onClick}) => {
+export const AddFriend: FC<AddFriendProps> = ({onClick, className}) => {
   const { theme } = useThemeContext();
   return (
     <button
       onClick={onClick}
-      className={`p-10 w-full flex h-12 group  items-center justify-start cursor-pointer text-gray-400 hover:bg-gray-100 shrink-0 transition-all duration-300`}
+      className={`${className || ''} ${theme ? 'hoverDarkColor text-gray-200' : 'hoverLightColor text-gray-500'} p-10 w-full flex h-12 group  items-center justify-start cursor-pointer shrink-0 transition-all duration-300`}
     >
       <LuUserPlus
         size={"40px"}
