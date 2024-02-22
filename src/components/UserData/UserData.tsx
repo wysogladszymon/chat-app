@@ -4,9 +4,10 @@ import { Logout } from "../";
 import styles from "./UserData.module.css";
 import { useThemeContext } from "../../store/ThemeContext";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { auth, storage } from "../../config/firebase";
+import { auth, db, storage } from "../../config/firebase";
 import { updateProfile } from "firebase/auth";
 import pic from "../../assets/defaultPicture.png";
+import { doc, updateDoc } from "firebase/firestore";
 
 interface UserDataProps {
 }
@@ -24,11 +25,15 @@ export const UserData: FC<UserDataProps> = () => {
     getDownloadURL(storageRef)
         .then(async (downloadURL ) => {
           console.log("Photo uploaded to storage. File available at", downloadURL);
-          if (auth.currentUser){ await updateProfile(auth.currentUser, {
+          if (auth.currentUser){ 
+            await updateProfile(auth.currentUser, {
             photoURL: downloadURL
           })
           console.log('Photo added to user information');
           setPhoto(downloadURL);
+          await updateDoc(doc(db, 'users', auth.currentUser.uid),{
+            photoURL: downloadURL
+          })
         }
         });
   };

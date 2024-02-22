@@ -51,6 +51,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const [friendRequests, setFriendRequests] = useState<friendRequest[]>([]);
     const [messages, setMessages] = useState<message[]>([]);
     const { theme } = useThemeContext();
+    const [inboxLoaded, setInboxLoaded] = useState<boolean>(false);
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
@@ -299,7 +300,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                     date: msg.date,
                     content: msg.content,
                     uid: msg.uid,
-                    photoURL: msg.photoURL
+                    photoURL: msg.photoURL,
                   };
                 });
                 if (!activeState.chat || !activeState.chat.user) return;
@@ -346,6 +347,36 @@ export const ChatApp: FC<ChatAppProps> = () => {
       };
     }, [currentUser, activeState]);
 
+    //it will fetch userdata changes like photo
+    useEffect(() => {
+      if (inbox.length > 0 && !inboxLoaded) {
+        const loadInboxData = async () => {
+          // we get document of user chats
+          const userChatsRef = doc(db, "userChats", currentUser.uid);
+          const userChats = await getDoc(userChatsRef);
+          if (userChats.exists()) {
+            // for all users fetch their data in 'users' collection to eventually update their userinfo
+            const updatedChats :inboxInterface[]= [];
+            console.log('typ: \n', typeof userChats.data().chats, 'dane: \n', userChats.data().chats );
+            for (let i of userChats.data().chats){
+              console.log('i: ', i);
+              const docum1 = await getDoc(doc(db, 'users', i.user.uid));
+              console.log(docum1.data());
+              i.user.photoURL = docum1.data()?.photoURL;
+              updatedChats.push(i);
+            }
+            console.log('modified data:', updatedChats);
+            await updateDoc(userChatsRef,{
+              chats: [...updatedChats]
+            });
+          }
+        };
+        loadInboxData();
+        console.log("Hej");
+
+        setInboxLoaded(true);
+      }
+    }, [inbox]);
     return (
       <div
         className={`h-screen flex justify-center items-center w-screen ${
@@ -388,7 +419,13 @@ export const ChatApp: FC<ChatAppProps> = () => {
           <div className={` grow flex flex-col justify-self-end overflow-auto`}>
             {inbox.map((u) => (
               <ChatInfo
-              className={`${activeState.chat && activeState.chat.user.uid === u.user.uid ? (theme ? 'activeDarkColor': 'activeLightColor') : ''}`}
+                className={`${
+                  activeState.chat && activeState.chat.user.uid === u.user.uid
+                    ? theme
+                      ? "activeDarkColor"
+                      : "activeLightColor"
+                    : ""
+                }`}
                 my={u.lastmsg.uid === currentUser.uid}
                 onClick={() => chatInfoClick(u)}
                 key={u.user.uid}
@@ -422,7 +459,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   photoURL={msg.photoURL}
                   date={formatDate(new Date(msg.date))}
                 >
-                  {msg.photoURL ? '' : msg.content}
+                  {msg.photoURL ? "" : msg.content}
                 </Message>
               ))}
             </Messages>
