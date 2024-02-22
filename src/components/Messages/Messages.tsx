@@ -11,6 +11,7 @@ import { User, message } from "../ChatApp";
 import { useThemeContext } from "../../store/ThemeContext";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { v4 as uuid } from "uuid";
+import { Arrow } from "../Arrow";
 
 interface MessagesProps {
   children?: ReactNode;
@@ -89,7 +90,7 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
                     };
                   })
               : [];
-            await  updateDoc(udoc2, { chats: data2 });
+            await updateDoc(udoc2, { chats: data2 });
           }
         })
         .catch((error) => {
@@ -161,10 +162,11 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
     return (
       <div className="w-full h-full flex flex-col ">
         <div
-          className={`flex ${
+          className={`flex sticky ${
             theme ? "border-b-gray-700 border-b-4" : "border-b-4"
           } p-5 items-center`}
         >
+          <Arrow />
           <h1
             className={`text-2xl ${
               theme ? "text-gray-200" : "text-gray-800"
@@ -179,11 +181,11 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
           <div ref={messagesEndRef} />
         </div>
         <div
-          className={`flex max-h-32 p-5  items-center justify-center ${
+          className={`flex h-24 p-5  items-center justify-center ${
             theme ? "text-gray-200" : "text-gray-500"
           }`}
         >
-          <div className="w-10 mr-5">
+          <div className="w-10 mr-5 sticky">
             <label
               className={`${styles.changePhoto}`}
               htmlFor={styles.fileinput}
@@ -201,14 +203,14 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className={`h-full outline-none p-5 grow rounded-2xl text-wrap bg-transparent ${
+            className={`h-full outline-none p-3 grow rounded-2xl text-wrap bg-transparent resize-none ${
               theme ? "border-gray-700 border-2" : "border-2"
             }`}
             placeholder="write a message..."
           />
           <button className="h-10 w-10 mr-5 ml-5">
             <LuSend
-            color={'black'}
+              color={"black"}
               onClick={sendMessage}
               size={"40px"}
               className="cursor-pointer border p-2 bg-gray-200 rounded-full"

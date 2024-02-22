@@ -10,13 +10,13 @@ import { User } from "../components";
 import { message } from "../components";
 
 interface useReducerStateInterface {
-  chat: {user: User, messages: message[] } | null | undefined;
+  chat: { user: User; messages: message[] } | null | undefined;
   addFriend: boolean;
   friendRequest: boolean;
 }
 interface useReducerActionInterface {
   type: string;
-  payload: {user: User, messages: message[] }| null | undefined;
+  payload: { user: User; messages: message[] } | null | undefined;
 }
 
 interface ActiveContextInterface {
@@ -51,6 +51,12 @@ const activeReducer = (
         addFriend: false,
         friendRequest: false,
         chat: action.payload,
+      };
+    case "OUT":
+      return {
+        addFriend: false,
+        friendRequest: false,
+        chat: null,
       };
     default:
       return state;

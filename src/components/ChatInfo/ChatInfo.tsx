@@ -23,6 +23,7 @@ export const ChatInfo: FC<ChatInfoProps> = ({
   my
 }) => {
   picURL = picURL || pic;
+  
   console.log();
   const {theme} = useThemeContext();
   return (

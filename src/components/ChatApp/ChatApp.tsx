@@ -12,9 +12,8 @@ import {
   ChatInfo,
   Welcome,
   FriendRequestUser,
-  NavIcon,
 } from "../";
-import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { arrayRemove, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { useActiveContext } from "../../store/ActiveContext";
 import { useAuthContext } from "../../store/AuthContext";
 import { db } from "../../config/firebase";
@@ -54,6 +53,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const [messages, setMessages] = useState<message[]>([]);
     const { theme } = useThemeContext();
     const [inboxLoaded, setInboxLoaded] = useState<boolean>(false);
+    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
@@ -64,18 +64,20 @@ export const ChatApp: FC<ChatAppProps> = () => {
       setMessages([]);
     };
 
-    const handledecline = async (id: string) => {
+    const handledecline = async (us: User) => {
       const requestRef = doc(db, "friendrequests", currentUser.uid);
 
-      //delete friendRequest
-      const users = friendRequests.filter((u) => u.uid !== id);
       await updateDoc(requestRef, {
-        users: users,
+        users: arrayRemove({
+          displayName: us.displayName,
+          email: us.email,
+          photoURL: us.photoURL,
+          uid:us.uid
+        }),
       });
-      setFriendRequests(users);
     };
 
-    const handleacceptance = async (us: friendRequest) => {
+    const handleacceptance = async (us: User) => {
       // create chat (request cannot be send if the chat already exists)
       const combinedID = getChatID(us.uid, currentUser.uid);
       await setDoc(doc(db, "chats", combinedID), {
@@ -171,9 +173,10 @@ export const ChatApp: FC<ChatAppProps> = () => {
       }
 
       //delete user from requests
-      handledecline(us.uid);
+      handledecline(us);
       dispatchActive({ type: "CHAT", payload: { user: us, messages: [] } });
     };
+
 
     const chatInfoClick = async (u: inboxInterface) => {
       if (u.user !== activeState.chat?.user) setMessages([]);
@@ -384,6 +387,34 @@ export const ChatApp: FC<ChatAppProps> = () => {
         setInboxLoaded(true);
       }
     }, [inbox]);
+
+    //will change between menus on mobile
+    useEffect(()=>{
+      console.log(windowWidth);
+      
+      if (windowWidth < 750){
+        const inboxselect = document.querySelector(`.${styles.inbox}`) as HTMLElement;
+        const messSelect = document.querySelector(`.${styles.messenger}`) as HTMLElement;
+        if(activeState.addFriend || activeState.chat || activeState.friendRequest){
+          inboxselect.style.display = "none";
+          messSelect.style.display = "flex";
+        }
+        else{
+          inboxselect.style.display = "flex";
+          messSelect.style.display = "none";
+        }
+      }
+    },[activeState])
+
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
     return (
       <div
         className={`h-screen flex justify-center items-center w-screen p-0 ${
@@ -392,7 +423,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
       >
         {/* sidebar */}
         <div
-          className={`flex flex-col h-[100svh] p-0 pt-5 grow ${styles.inbox} ${
+          className={`flex flex-col h-[100dvh] p-0 pt-5 grow ${styles.inbox} ${
             !theme ? "bg-white" : "bg-gray-950"
           }`}
         >
@@ -449,12 +480,11 @@ export const ChatApp: FC<ChatAppProps> = () => {
         </div>
         {/* current Chat */}
         <div
-          className={`h-full flex-col grow-[9990]  ${styles.messenger}  ${
+          className={`h-[100dvh] flex-col grow-[9990] max-w-[1400px]  ${styles.messenger}  ${
             theme ? "activeDarkColor" : "activeLightColor"
           }`}
         >
           <div className={`pt-4 pl-4 ${styles.nav}`}>
-            <NavIcon />
           </div>
 
           {activeState.chat && (
@@ -484,7 +514,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   displayName={r.displayName}
                   email={r.email}
                   photoURL={r.photoURL}
-                  decline={() => handledecline(r.uid)}
+                  decline={() => handledecline(r)}
                   accept={() => handleacceptance(r)}
                 />
               ))}

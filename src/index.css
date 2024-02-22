@@ -15,7 +15,9 @@
 .hoverDarkColor:hover{
   background-color: #202124
 }
-
+.arrow{
+  display: none;
+}
 @media (width < 750px){
   .activeDarkColor{
     background-color:transparent;
@@ -23,6 +25,7 @@
   .activeLightColor{
     background-color:transparent;
   }
-  .inbox{
+  .arrow{
+    display: block;
   }
 }

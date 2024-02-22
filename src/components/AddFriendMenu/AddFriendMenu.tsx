@@ -15,6 +15,7 @@ import {} from "firebase/firestore";
 import { AddFriendUser } from "../AddFriendUser";
 import { useAuthContext } from "../../store/AuthContext";
 import { getChatID } from "../../store/chatFunctions";
+import { Arrow } from "../Arrow";
 
 type fetchedUser = {
   email: string;
@@ -41,11 +42,16 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
         where("displayNameLower", "<", user.toLowerCase() + "\uf8ff")
       );
       const userFriend = await getDoc(doc(db, "userChats", currentUser.uid));
-      const friendIDs : string[] = userFriend.exists() ? userFriend.data().chats.map((el : any) => el.user.uid) : [];
+      const friendIDs: string[] = userFriend.exists()
+        ? userFriend.data().chats.map((el: any) => el.user.uid)
+        : [];
       const querySnapshot = await getDocs(q);
       const users: fetchedUser[] = [];
       querySnapshot.forEach((doc) => {
-        if (doc.data().uid !== currentUser?.uid && !friendIDs.includes(doc.data().uid) )
+        if (
+          doc.data().uid !== currentUser?.uid &&
+          !friendIDs.includes(doc.data().uid)
+        )
           users.push({
             email: String(doc.data().email),
             displayName: String(doc.data().displayName),
@@ -106,8 +112,11 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
     };
 
     return (
-      <div className="w-full h-full flex flex-col p-10 ">
-        <h1 className="text-3xl pl-3">Add Friend</h1>
+      <div className="w-full h-full flex flex-col p-5">
+        <div className="flex gap-3 w-full items-center mb-5 ">
+          <Arrow />
+          <h1 className="text-3xl pl-3">Add Friend</h1>
+        </div>
         <input
           className={`text-gray-700 outline-none mt-4 p-4 rounded-2xl mb-10 w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
           type="text"

@@ -9,8 +9,7 @@ import { updateProfile } from "firebase/auth";
 import pic from "../../assets/defaultPicture.png";
 import { doc, updateDoc } from "firebase/firestore";
 
-interface UserDataProps {
-}
+interface UserDataProps {}
 
 export const UserData: FC<UserDataProps> = () => {
   const { currentUser } = useAuthContext();
@@ -22,28 +21,27 @@ export const UserData: FC<UserDataProps> = () => {
     const file = e.target.files[0];
     const storageRef = ref(storage, String(currentUser?.displayName));
     await uploadBytesResumable(storageRef, file);
-    getDownloadURL(storageRef)
-        .then(async (downloadURL ) => {
-          console.log("Photo uploaded to storage. File available at", downloadURL);
-          if (auth.currentUser){ 
-            await updateProfile(auth.currentUser, {
-            photoURL: downloadURL
-          })
-          console.log('Photo added to user information');
-          setPhoto(downloadURL);
-          await updateDoc(doc(db, 'users', auth.currentUser.uid),{
-            photoURL: downloadURL
-          })
-        }
+    getDownloadURL(storageRef).then(async (downloadURL) => {
+      console.log("Photo uploaded to storage. File available at", downloadURL);
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          photoURL: downloadURL,
         });
+        console.log("Photo added to user information");
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+          photoURL: downloadURL,
+        });
+        setPhoto(downloadURL);
+      }
+    })
   };
 
   useEffect(() => {
-    currentUser && setPhoto(currentUser.photoURL);    
+    currentUser && setPhoto(currentUser.photoURL);
   }, [currentUser, editPhoto]);
 
   return (
-    <div className="flex items-center justify-center w-[100%] p-2">
+    <div className="flex items-center justify-center content-between min-w-[350px] p-2">
       <div>
         <div
           className={`${styles.profilePhoto}`}
@@ -72,7 +70,9 @@ export const UserData: FC<UserDataProps> = () => {
       </div>
       <div className={`flex flex-col items-center justify-center grow`}>
         <h1 className={` font-bold`}>{currentUser?.displayName}</h1>
-        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-xs`}>{currentUser?.email}</p>
+        <p className={`${theme ? "text-gray-200" : "text-gray-500"} text-xs`}>
+          {currentUser?.email}
+        </p>
       </div>
       <div className="h-12 w-12 justify-self-end">
         <Logout />

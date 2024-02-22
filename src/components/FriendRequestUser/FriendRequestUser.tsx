@@ -22,7 +22,7 @@ export const FriendRequestUser: FC<FriendRequestUserProps> = ({
   if (!photoURL) photoURL = pic;
   const {theme} = useThemeContext();
   return (
-    <div className={`w-[50%] min-w-[450px] p-5 flex items-center gap-5 ${!theme ? 'text-gray-500 border-2 border-gray-200' : 'text-gray-200 border-2 border-gray-500'}  border-gray-300 rounded-3xl`}>
+    <div className={` p-5 max-w-[600px] flex items-center gap-5 ${!theme ? 'text-gray-500 border-2 border-gray-200' : 'text-gray-200 border-2 border-gray-500'}  border-gray-300 rounded-3xl`}>
       <div
         className={`${styles.profilePhoto}`}
         style={{

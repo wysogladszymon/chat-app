@@ -18,24 +18,19 @@ export const Message: FC<MessageProps> = ({ children, my, date, photoURL }) => {
     : theme
     ? "bg-gray-600"
     : "bg-gray-300";
-  const cls = my ? "ml-auto mr-16" : "ml-16 mr-auto";
+  const cls = my ? "ml-auto mr-3" : "ml-3 mr-auto";
   console.log(photoURL);
 
   return (
     <div className={`${cls} mt-3 mb-3`}>
       {photoURL ? (
         <div
-          className={`flex justify-center items-center max-h-96 max-w-96 rounded-lg overflow-hidden`}
+          className={`rounded-lg overflow-hidden`}
         >
           <img
+          className={`${my ? 'ml-auto' : 'mr-auto'} rounded-lg w-[70%]`}
             src={photoURL}
             alt="Uploaded Photo"
-            style={{
-              maxWidth: "100%",
-              maxHeight: "100%",
-              width: "auto",
-              height: "auto",
-            }}
           />
         </div>
       ) : (
