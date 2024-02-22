@@ -208,6 +208,7 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
           />
           <button className="h-10 w-10 mr-5 ml-5">
             <LuSend
+            color={'black'}
               onClick={sendMessage}
               size={"40px"}
               className="cursor-pointer border p-2 bg-gray-200 rounded-full"

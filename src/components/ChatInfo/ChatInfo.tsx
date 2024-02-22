@@ -43,14 +43,14 @@ export const ChatInfo: FC<ChatInfoProps> = ({
           />
         }
       </div>
-      <div className="ml-5 grow overflow-hidden">
+      <div className="grow overflow-hidden">
         <h1 className="font-medium text-xl">{name}</h1>
         <div className='flex'>
-        {my && <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} mr-1 text-sm `}>You: </p>}
-        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} h-5 overflow-hidden text-sm max-w-[277px]`}>{lastmsg}</p>
+        {my && <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-xs mr-1`}>You: </p>}
+        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} h-5 overflow-hidden text-xs max-w-[277px]`}>{lastmsg}</p>
         </div>
       </div>
-      <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-sm flex flex-col items-center`}>
+      <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-xs flex flex-col items-center`}>
         <span>{date && date.split(" ")[1]}</span>
         <span>{date && date.split(" ")[0]}</span>
       </p>

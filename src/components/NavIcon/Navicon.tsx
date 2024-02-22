@@ -11,7 +11,6 @@ export const NavIcon: FC<NavIconProps> = ({ children }) => {
   return (
     <div
       className={`${styles.logo} ${clicked ? styles.active : ""}`}
-      style={{ display: "none" }}
       onClick={() => setClicked(!clicked)}
     >
       <span className="bg-gray-400"></span>

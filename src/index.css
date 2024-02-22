@@ -16,3 +16,13 @@
   background-color: #202124
 }
 
+@media (width < 750px){
+  .activeDarkColor{
+    background-color:transparent;
+  }
+  .activeLightColor{
+    background-color:transparent;
+  }
+  .inbox{
+  }
+}

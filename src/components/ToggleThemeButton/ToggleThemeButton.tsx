@@ -20,7 +20,7 @@ export const ToggleThemeButton: FC<ToggleThemeButtonProps> = ({
     circ.style.backgroundColor = theme ? '#94a3b8' : 'white';
   };
   return (
-    <label htmlFor={check} className={` ${button}`}>
+    <label htmlFor={check} className={` ${button} mr-5`}>
       <input type="checkbox" onClick={handleClick} id={check} />
       <FaSun className={sun} />
       <FaMoon color="white" className={moon} />

@@ -43,7 +43,7 @@ export const UserData: FC<UserDataProps> = () => {
   }, [currentUser, editPhoto]);
 
   return (
-    <div className="flex items-center justify-center p-6 ">
+    <div className="flex items-center justify-center w-[100%] p-2">
       <div>
         <div
           className={`${styles.profilePhoto}`}
@@ -70,11 +70,11 @@ export const UserData: FC<UserDataProps> = () => {
           />
         </div>
       </div>
-      <div className={`flex flex-col items-center justify-center`}>
-        <h1 className={` font-bold text-xl`}>{currentUser?.displayName}</h1>
-        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'}`}>{currentUser?.email}</p>
+      <div className={`flex flex-col items-center justify-center grow`}>
+        <h1 className={` font-bold`}>{currentUser?.displayName}</h1>
+        <p className={`${theme ? 'text-gray-200' : 'text-gray-500'} text-xs`}>{currentUser?.email}</p>
       </div>
-      <div className="h-12 w-12 ml-20">
+      <div className="h-12 w-12 justify-self-end">
         <Logout />
       </div>
     </div>

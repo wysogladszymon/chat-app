@@ -1,0 +1,18 @@
+.messenger{
+  display:flex;
+}
+.inbox{
+  display: flex;
+}
+.nav{
+  display: none;
+}
+@media (width < 750px){
+  .messenger{
+    display: none;
+    width: 100vw;
+  }
+  .nav{
+    display: block
+  }
+}

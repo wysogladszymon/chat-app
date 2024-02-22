@@ -12,6 +12,7 @@ import {
   ChatInfo,
   Welcome,
   FriendRequestUser,
+  NavIcon,
 } from "../";
 import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { useActiveContext } from "../../store/ActiveContext";
@@ -20,6 +21,7 @@ import { db } from "../../config/firebase";
 import { getChatID } from "../../store/chatFunctions";
 import { formatDate } from "../../store/dateManagement";
 import { useThemeContext } from "../../store/ThemeContext";
+import styles from "./ChatApp.module.css";
 
 const DEBOUNCE_DELAY = 0;
 
@@ -356,18 +358,23 @@ export const ChatApp: FC<ChatAppProps> = () => {
           const userChats = await getDoc(userChatsRef);
           if (userChats.exists()) {
             // for all users fetch their data in 'users' collection to eventually update their userinfo
-            const updatedChats :inboxInterface[]= [];
-            console.log('typ: \n', typeof userChats.data().chats, 'dane: \n', userChats.data().chats );
-            for (let i of userChats.data().chats){
-              console.log('i: ', i);
-              const docum1 = await getDoc(doc(db, 'users', i.user.uid));
+            const updatedChats: inboxInterface[] = [];
+            console.log(
+              "typ: \n",
+              typeof userChats.data().chats,
+              "dane: \n",
+              userChats.data().chats
+            );
+            for (let i of userChats.data().chats) {
+              console.log("i: ", i);
+              const docum1 = await getDoc(doc(db, "users", i.user.uid));
               console.log(docum1.data());
               i.user.photoURL = docum1.data()?.photoURL;
               updatedChats.push(i);
             }
-            console.log('modified data:', updatedChats);
-            await updateDoc(userChatsRef,{
-              chats: [...updatedChats]
+            console.log("modified data:", updatedChats);
+            await updateDoc(userChatsRef, {
+              chats: [...updatedChats],
             });
           }
         };
@@ -379,20 +386,20 @@ export const ChatApp: FC<ChatAppProps> = () => {
     }, [inbox]);
     return (
       <div
-        className={`h-screen flex justify-center items-center w-screen ${
+        className={`h-screen flex justify-center items-center w-screen p-0 ${
           theme ? "text-white" : "text-gray-950"
         }`}
       >
         {/* sidebar */}
         <div
-          className={`flex flex-col h-full  relative pt-5 max-w-[512px] ${
+          className={`flex flex-col h-[100svh] p-0 pt-5 grow ${styles.inbox} ${
             !theme ? "bg-white" : "bg-gray-950"
           }`}
         >
-          <div className="flex align-center justify-end ">
+          <div className="flex align-center justify-end content-between">
             <ToggleThemeButton />
           </div>
-          <div className="mt-20 ">
+          <div className="mt-5 ">
             <AddFriend
               className={`${
                 activeState.addFriend
@@ -442,10 +449,14 @@ export const ChatApp: FC<ChatAppProps> = () => {
         </div>
         {/* current Chat */}
         <div
-          className={`w-full h-full flex flex-col ${
+          className={`h-full flex-col grow-[9990]  ${styles.messenger}  ${
             theme ? "activeDarkColor" : "activeLightColor"
           }`}
         >
+          <div className={`pt-4 pl-4 ${styles.nav}`}>
+            <NavIcon />
+          </div>
+
           {activeState.chat && (
             <Messages
               name={
