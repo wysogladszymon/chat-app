@@ -37,6 +37,7 @@ export interface message {
   date: string;
   content: string;
   uid: string;
+  photoURL?: string;
 }
 export interface inboxInterface {
   lastmsg: message;
@@ -298,6 +299,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                     date: msg.date,
                     content: msg.content,
                     uid: msg.uid,
+                    photoURL: msg.photoURL
                   };
                 });
                 if (!activeState.chat || !activeState.chat.user) return;
@@ -417,9 +419,10 @@ export const ChatApp: FC<ChatAppProps> = () => {
                 <Message
                   my={currentUser?.uid === msg.uid}
                   key={index}
+                  photoURL={msg.photoURL}
                   date={formatDate(new Date(msg.date))}
                 >
-                  {msg.content}
+                  {msg.photoURL ? '' : msg.content}
                 </Message>
               ))}
             </Messages>

@@ -5,10 +5,12 @@ import styles from "./Messages.module.css";
 import { useAuthContext } from "../../store/AuthContext";
 import { useActiveContext } from "../../store/ActiveContext";
 import { getChatID } from "../../store/chatFunctions";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { db, storage } from "../../config/firebase";
 import { User, message } from "../ChatApp";
 import { useThemeContext } from "../../store/ThemeContext";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { v4 as uuid } from "uuid";
 
 interface MessagesProps {
   children?: ReactNode;
@@ -20,9 +22,81 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
   const { activeState } = useActiveContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const {theme} = useThemeContext();
+  const { theme } = useThemeContext();
   if (currentUser && activeState.chat) {
     const [message, setMessage] = useState<string>("");
+
+    const sendPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!e.target.files) return;
+      const file = e.target.files[0];
+
+      const storageRef = ref(storage, uuid());
+      await uploadBytesResumable(storageRef, file);
+
+      getDownloadURL(storageRef)
+        .then(async (downloadURL) => {
+          console.log("File available at", downloadURL);
+
+          // Dodaj downloadURL do naszej konwersacji
+          const combinedID = getChatID(
+            currentUser?.uid,
+            activeState.chat?.user.uid ?? ""
+          );
+
+          const doc1 = doc(db, "chats", combinedID);
+          const newmsg = {
+            date: new Date().toString(),
+            content: "photo",
+            uid: currentUser.uid,
+            photoURL: downloadURL,
+          };
+
+          await updateDoc(doc1, {
+            messages: arrayUnion(newmsg),
+          });
+
+          console.log("Photo sent successfully :D");
+          e.target.files = null;
+          if (activeState.chat) {
+            const udoc1 = doc(db, "userChats", currentUser.uid);
+            const userchat1 = await getDoc(udoc1);
+            const data1 = userchat1.exists()
+              ? userchat1
+                  .data()
+                  .chats.map((el: { lastmsg: message; user: User }) => {
+                    return {
+                      user: el.user,
+                      lastmsg:
+                        el.user.uid === activeState.chat?.user.uid
+                          ? newmsg
+                          : el.lastmsg,
+                    };
+                  })
+              : [];
+            await updateDoc(udoc1, { chats: data1 });
+
+            //update userChats with lastmsg
+            const udoc2 = doc(db, "userChats", activeState.chat.user.uid);
+            const userchat2 = await getDoc(udoc2);
+            const data2 = userchat2.exists()
+              ? userchat2
+                  .data()
+                  .chats.map((el: { lastmsg: message; user: User }) => {
+                    return {
+                      user: el.user,
+                      lastmsg:
+                        el.user.uid === currentUser.uid ? newmsg : el.lastmsg,
+                    };
+                  })
+              : [];
+            await  updateDoc(udoc2, { chats: data2 });
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting download URL:", error);
+        });
+    };
+
     const sendMessage = async () => {
       // get chatID and place there message
       const combinedID = getChatID(
@@ -31,23 +105,13 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
       );
 
       const doc1 = doc(db, "chats", combinedID);
-      const chatDoc = await getDoc(doc1);
       const newmsg = {
-        date: (new Date()).toString(),
+        date: new Date().toString(),
         content: message,
         uid: currentUser.uid,
       };
-      if (!chatDoc.exists()) return;
-      const msgs = chatDoc.data().messages.map((ms: message) => {
-        return {
-          date: ms.date,
-          content: ms.content,
-          uid: ms.uid,
-        };
-      });
-      msgs.push(newmsg);
       await updateDoc(doc1, {
-        messages: [...msgs],
+        messages: arrayUnion(newmsg),
       });
 
       //update userChats with lastmsg
@@ -96,14 +160,29 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
     }, [children]);
     return (
       <div className="w-full h-full flex flex-col ">
-        <div className={`flex ${theme ? 'border-b-gray-700 border-b-4': "border-b-4"} p-5 items-center`}>
-          <h1 className={`text-2xl ${theme ? 'text-gray-200' : 'text-gray-800'} ml-20`}> {name}</h1>
+        <div
+          className={`flex ${
+            theme ? "border-b-gray-700 border-b-4" : "border-b-4"
+          } p-5 items-center`}
+        >
+          <h1
+            className={`text-2xl ${
+              theme ? "text-gray-200" : "text-gray-800"
+            } ml-20`}
+          >
+            {" "}
+            {name}
+          </h1>
         </div>
         <div className={`${styles.scroll} grow flex flex-col justify-self-end`}>
           {children}
           <div ref={messagesEndRef} />
         </div>
-        <div className={`flex max-h-32 p-5  items-center justify-center ${theme ? 'text-gray-200' : 'text-gray-500'}`}>
+        <div
+          className={`flex max-h-32 p-5  items-center justify-center ${
+            theme ? "text-gray-200" : "text-gray-500"
+          }`}
+        >
           <div className="w-10 mr-5">
             <label
               className={`${styles.changePhoto}`}
@@ -116,12 +195,15 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
               id={styles.fileinput}
               style={{ display: "none" }}
               accept="image/jpeg, image/png, image/jpg"
+              onChange={sendPhoto}
             />
           </div>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className={`h-full outline-none p-5 grow rounded-2xl text-wrap bg-transparent ${theme ? 'border-gray-700 border-2': "border-2"}`}
+            className={`h-full outline-none p-5 grow rounded-2xl text-wrap bg-transparent ${
+              theme ? "border-gray-700 border-2" : "border-2"
+            }`}
             placeholder="write a message..."
           />
           <button className="h-10 w-10 mr-5 ml-5">

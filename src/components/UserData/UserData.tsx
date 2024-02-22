@@ -4,7 +4,7 @@ import { Logout } from "../";
 import styles from "./UserData.module.css";
 import { useThemeContext } from "../../store/ThemeContext";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { storage } from "../../config/firebase";
+import { auth, storage } from "../../config/firebase";
 import { updateProfile } from "firebase/auth";
 import pic from "../../assets/defaultPicture.png";
 
@@ -20,22 +20,21 @@ export const UserData: FC<UserDataProps> = () => {
     if (!e.target.files) return;
     const file = e.target.files[0];
     const storageRef = ref(storage, String(currentUser?.displayName));
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on("state_changed", () => {
-      getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-        console.log("File available at", downloadURL);
-        currentUser &&
-          (await updateProfile(currentUser, {
-            photoURL: downloadURL,
-          }));
-        setPhoto(downloadURL);
-      });
-    });
+    await uploadBytesResumable(storageRef, file);
+    getDownloadURL(storageRef)
+        .then(async (downloadURL ) => {
+          console.log("Photo uploaded to storage. File available at", downloadURL);
+          if (auth.currentUser){ await updateProfile(auth.currentUser, {
+            photoURL: downloadURL
+          })
+          console.log('Photo added to user information');
+          setPhoto(downloadURL);
+        }
+        });
   };
 
   useEffect(() => {
-    setPhoto(currentUser?.photoURL);    
+    currentUser && setPhoto(currentUser.photoURL);    
   }, [currentUser, editPhoto]);
 
   return (
