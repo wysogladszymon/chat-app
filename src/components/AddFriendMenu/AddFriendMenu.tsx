@@ -37,7 +37,7 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
 
     const handleKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
       setErr("");
-      if (e.key !== "Enter" || user.length < 1) return;
+      if (e.key !== "Enter") return;
 
       const usersRef = collection(db, "users");
 
