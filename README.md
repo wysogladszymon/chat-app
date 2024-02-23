@@ -23,7 +23,8 @@ You can check my app [HERE](https://chatapp-e8817.web.app/), or you can also ins
    ```
 3. **Open terminal and go to folder of the project using
    ```bash
-   cd <folder path>```.
+   cd <folder path>
+   ```
 5. Type
    ```bash
    npm install
