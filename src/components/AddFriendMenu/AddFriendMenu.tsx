@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { db } from "../../config/firebase";
 import {
   collection,
@@ -32,6 +32,9 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
     const [user, setUser] = useState<string>("");
     const [searchedUsers, setSearchedUsers] = useState<fetchedUser[]>([]);
     const [err, setErr] = useState<string>("");
+    const [isFocused, setIsFocused] = useState(false);
+    const bottomRef = useRef<HTMLDivElement>(null);
+
     const handleKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
       setErr("");
       if (e.key !== "Enter" || user.length < 1) return;
@@ -117,14 +120,22 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
       }
     };
 
+    useEffect(() => {
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: "instant" });
+      }
+    }, [isFocused]);
     return (
-      <div className="w-full h-full flex flex-col p-5">
+      <div className="w-full h-full flex flex-col p-5 overflow-hidden">
         <div className="flex gap-3 w-full items-center mb-5 ">
           <Arrow />
           <h1 className="text-3xl pl-3 ">Add Friend</h1>
         </div>
-        <div className='relative mt-4 mb-10'>
-          <IoMdSearch size={"20px"} className='absolute top-[50%] left-1 -translate-y-[50%]'/>
+        <div className="relative mt-4 mb-10">
+          <IoMdSearch
+            size={"20px"}
+            className="absolute top-[50%] left-1 -translate-y-[50%]"
+          />
           <input
             className={`text-gray-700 outline-none  pr-4 pt-4 pb-4 pl-7 rounded-2xl  w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
             type="text"
@@ -132,6 +143,8 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
             value={user}
             onChange={(e) => setUser(e.target.value)}
             onKeyDown={handleKey}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
           />
         </div>
         <div
@@ -152,6 +165,7 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
             <p>{err}</p>
           )}
         </div>
+        <div ref={bottomRef} />
       </div>
     );
   }

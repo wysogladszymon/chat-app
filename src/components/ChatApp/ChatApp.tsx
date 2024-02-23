@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import debounce from "lodash/debounce";
 import {
   ToggleThemeButton,
@@ -11,6 +11,8 @@ import {
   UserData,
   ChatInfo,
   FriendRequestUser,
+  ChatSearch,
+  SearchChatMenu,
 } from "../";
 import {
   arrayRemove,
@@ -62,6 +64,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const [inboxLoaded, setInboxLoaded] = useState<boolean>(false);
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [today, setToday] = useState<Date | null>(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
 
     function fetchActualDate() {
       fetch("http://worldtimeapi.org/api/timezone/Europe/Warsaw")
@@ -88,6 +91,10 @@ export const ChatApp: FC<ChatAppProps> = () => {
       dispatchActive({ type: "ADD_FRIEND", payload: null });
       setMessages([]);
     };
+    const handleSearch = () =>{
+      dispatchActive({ type: "SEARCH", payload: null });
+      setMessages([]);
+    }
 
     const handledecline = async (us: User) => {
       const requestRef = doc(db, "friendrequests", currentUser.uid);
@@ -425,7 +432,8 @@ export const ChatApp: FC<ChatAppProps> = () => {
         if (
           activeState.addFriend ||
           activeState.chat ||
-          activeState.friendRequest
+          activeState.friendRequest || 
+          activeState.search
         ) {
           inboxselect.style.display = "none";
           messSelect.style.display = "flex";
@@ -433,14 +441,16 @@ export const ChatApp: FC<ChatAppProps> = () => {
           inboxselect.style.display = "flex";
           messSelect.style.display = "none";
         }
-      }
-      else{
+      } else {
         inboxselect.style.display = "flex";
         messSelect.style.display = "flex";
       }
     }, [activeState, windowWidth]);
 
     useEffect(() => {
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: "instant" });
+      }
       const handleResize = () => {
         setWindowWidth(window.innerWidth);
       };
@@ -457,9 +467,9 @@ export const ChatApp: FC<ChatAppProps> = () => {
       >
         {/* sidebar */}
         <div
-          className={`flex flex-col h-[100dvh] mt-0 p-0  shrink-0 sticky grow ${styles.inbox} ${
-            !theme ? "bg-white" : "bg-gray-950"
-          }`}
+          className={`flex flex-col h-[100dvh] mt-0 p-0  shrink-0 sticky grow ${
+            styles.inbox
+          } ${!theme ? "bg-white" : "bg-gray-950"}`}
         >
           <div className="flex align-center mt-4 justify-end content-between">
             <ToggleThemeButton />
@@ -486,8 +496,18 @@ export const ChatApp: FC<ChatAppProps> = () => {
               onClick={handleFriendReq}
               count={friendRequests ? friendRequests.length : 0}
             />
+            <ChatSearch
+              className={`${
+                activeState.search
+                  ? theme
+                    ? "activeDarkColor"
+                    : "activeLightColor"
+                  : ""
+              }`}
+              onClick={handleSearch}
+            />
           </div>
-          <p className="p-4 text-gray-400 text-sm">chats</p>
+          {/* <p className="p-4 text-gray-400 text-sm">chats</p> */}
           <div className={` grow flex flex-col justify-self-end overflow-auto`}>
             {inbox.map((u) => (
               <ChatInfo
@@ -506,7 +526,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   u.lastmsg.date
                     ? today?.toDateString() ===
                       new Date(u.lastmsg.date).toDateString()
-                      ? formatHours(new Date(u.lastmsg.date)) + ' today'
+                      ? formatHours(new Date(u.lastmsg.date)) + " today"
                       : formatDate(new Date(u.lastmsg.date))
                     : ""
                 }
@@ -530,7 +550,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
             styles.messenger
           }  ${theme ? "activeDarkColor" : "activeLightColor"}`}
         >
-
           {activeState.chat && (
             <Messages
               name={
@@ -542,12 +561,14 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   my={currentUser?.uid === msg.uid}
                   key={index}
                   photoURL={msg.photoURL}
-                  date={msg.date
-                    ? today?.toDateString() ===
-                      new Date(msg.date).toDateString()
-                      ? formatHours(new Date(msg.date))
-                      : formatDate(new Date(msg.date))
-                    : ""}
+                  date={
+                    msg.date
+                      ? today?.toDateString() ===
+                        new Date(msg.date).toDateString()
+                        ? formatHours(new Date(msg.date))
+                        : formatDate(new Date(msg.date))
+                      : ""
+                  }
                 >
                   {msg.photoURL ? "" : msg.content}
                 </Message>
@@ -569,7 +590,9 @@ export const ChatApp: FC<ChatAppProps> = () => {
               ))}
             </FriendRequestsMenu>
           )}
+          {activeState.search && <SearchChatMenu today={today} chatInfoClick={chatInfoClick} inbox={inbox}/>}
         </div>
+        <div ref={bottomRef} />
       </div>
     );
   }

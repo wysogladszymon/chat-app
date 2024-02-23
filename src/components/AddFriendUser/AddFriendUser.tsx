@@ -31,7 +31,7 @@ export const AddFriendUser: FC<AddFriendUserProps> = ({
         !theme
           ? "text-gray-500 border-2 border-gray-200"
           : "text-gray-200 border-2 border-gray-500"
-      }  border-gray-300 rounded-3xl`}
+      }  rounded-3xl`}
     >
       <div
         className={`${styles.profilePhoto}`}

@@ -16,3 +16,5 @@ export * from './AddFriendMenu';
 export * from './AddFriendUser';
 export * from './FriendRequestUser';
 export * from './Arrow';
+export * from './ChatSearch';
+export * from './SearchChatMenu';

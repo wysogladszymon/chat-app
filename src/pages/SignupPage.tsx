@@ -3,7 +3,6 @@ import { Signup } from "../components";
 import { useThemeContext } from "../store/ThemeContext";
 import { ToggleThemeButton } from "../components";
 import {
-  AuthError,
   createUserWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
@@ -12,8 +11,7 @@ import { auth, googleProvider, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
 import { doc, setDoc } from "firebase/firestore";
-interface SignupPageProps {
-}
+interface SignupPageProps {}
 
 export const SignupPage: FC<SignupPageProps> = () => {
   const { theme } = useThemeContext();
@@ -50,31 +48,26 @@ export const SignupPage: FC<SignupPageProps> = () => {
         uid: res.user.uid,
       });
     } catch (err) {
-      const eerr = err as AuthError;
-      console.log(eerr.code);
-
-      setError(eerr?.message);
+      setError("Something went wrong!");
     }
   };
 
   const googlesignup = async () => {
-    await signInWithPopup(auth, googleProvider).then(
-      async (userCredential) => {
-        const userdata = userCredential.user;
-        console.log("Registered succesfully: ", userdata);
+    await signInWithPopup(auth, googleProvider).then(async (userCredential) => {
+      const userdata = userCredential.user;
+      console.log("Registered succesfully: ", userdata);
 
-        setCurrentUser(userdata);
+      setCurrentUser(userdata);
 
-        await setDoc(doc(db, "users", userdata.uid), {
-          displayName: userdata.displayName,
-          displayNameLower: userdata.displayName?.toLowerCase(),
-          email: userdata.email,
-          photoURL: userdata.photoURL,
-          uid: userdata.uid,
-        });
-        nav("/");
-      }
-    );
+      await setDoc(doc(db, "users", userdata.uid), {
+        displayName: userdata.displayName,
+        displayNameLower: userdata.displayName?.toLowerCase(),
+        email: userdata.email,
+        photoURL: userdata.photoURL,
+        uid: userdata.uid,
+      });
+      nav("/");
+    });
   };
   return (
     <div

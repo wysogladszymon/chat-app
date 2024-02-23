@@ -13,6 +13,7 @@ interface useReducerStateInterface {
   chat: { user: User; messages: message[] } | null | undefined;
   addFriend: boolean;
   friendRequest: boolean;
+  search: boolean;
 }
 interface useReducerActionInterface {
   type: string;
@@ -25,7 +26,7 @@ interface ActiveContextInterface {
 }
 
 export const ActiveContext = createContext<ActiveContextInterface>({
-  activeState: { chat: null, friendRequest: false, addFriend: false },
+  activeState: { chat: null, friendRequest: false, addFriend: false, search: false },
   dispatchActive: () => {},
 });
 
@@ -45,18 +46,28 @@ const activeReducer = (
         chat: null,
         addFriend: false,
         friendRequest: true,
+        search: false
       };
     case "CHAT":
       return {
         addFriend: false,
         friendRequest: false,
         chat: action.payload,
+        search: false
       };
+    case "SEARCH":
+      return{
+        addFriend: false,
+        friendRequest: false,
+        chat: null,
+        search: true,
+      }
     case "OUT":
       return {
         addFriend: false,
         friendRequest: false,
         chat: null,
+        search: false
       };
     default:
       return state;
@@ -73,6 +84,7 @@ export const ActiveContextProvider: FC<ActiveContextProviderProps> = ({
     chat: null,
     addFriend: false,
     friendRequest: false,
+    search: false
   });
 
   return (

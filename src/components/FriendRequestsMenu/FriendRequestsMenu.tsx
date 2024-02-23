@@ -8,7 +8,7 @@ export const FriendRequestsMenu: FC<FriendRequestsMenuProps> = ({
   children,
 }) => {
   return (
-    <div className="w-full h-full flex flex-col p-5">
+    <div className="w-full h-full flex flex-col p-5 overflow-hidden">
       <div className="flex gap-3 w-full items-center mb-6 ">
         <Arrow />
         <h1 className="text-3xl pl-3"> Friend requests</h1>
