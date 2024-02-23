@@ -85,7 +85,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     }
     useEffect(() => {
       fetchActualDate();
-    }, []);
+    }, [currentUser]);
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
