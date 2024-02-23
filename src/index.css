@@ -3,29 +3,36 @@
 @tailwind utilities;
 
 .activeLightColor {
-  background-color: rgb(243 244 246)
+  background-color: rgb(243 244 246);
 }
-.activeDarkColor{
-  background-color: #202124
+.activeDarkColor {
+  background-color: #202124;
 }
 
 .hoverLightColor:hover {
-  background-color: rgb(243 244 246)
+  background-color: rgb(243 244 246);
 }
-.hoverDarkColor:hover{
-  background-color: #202124
+.hoverDarkColor:hover {
+  background-color: #202124;
 }
-.arrow{
+.arrow {
   display: none;
 }
-@media (width < 750px){
-  .activeDarkColor{
-    background-color:transparent;
-  }
-  .activeLightColor{
-    background-color:transparent;
-  }
-  .arrow{
+body {
+  height: 100dvh;
+  background-color: #000;
+  overflow-x: hidden;
+  overflow: hidden;
+  color: white;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px;
+}
+
+@media (width < 750px) {
+  .arrow {
     display: block;
   }
 }

@@ -16,6 +16,7 @@ import { AddFriendUser } from "../AddFriendUser";
 import { useAuthContext } from "../../store/AuthContext";
 import { getChatID } from "../../store/chatFunctions";
 import { Arrow } from "../Arrow";
+import { IoMdSearch } from "react-icons/io";
 
 type fetchedUser = {
   email: string;
@@ -30,9 +31,10 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
   if (currentUser) {
     const [user, setUser] = useState<string>("");
     const [searchedUsers, setSearchedUsers] = useState<fetchedUser[]>([]);
-
+    const [err, setErr] = useState<string>("");
     const handleKey = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key !== "Enter") return;
+      setErr("");
+      if (e.key !== "Enter" || user.length < 1) return;
 
       const usersRef = collection(db, "users");
 
@@ -60,6 +62,10 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
           });
       });
       setSearchedUsers(users);
+      if (!(users.length > 0))
+        setErr(
+          `We are really sorry, but no users found for your search "${user}"`
+        );
     };
 
     const handleClick = async (id: string) => {
@@ -115,29 +121,36 @@ export const AddFriendMenu: FC<AddFriendMenuProps> = () => {
       <div className="w-full h-full flex flex-col p-5">
         <div className="flex gap-3 w-full items-center mb-5 ">
           <Arrow />
-          <h1 className="text-3xl pl-3">Add Friend</h1>
+          <h1 className="text-3xl pl-3 ">Add Friend</h1>
         </div>
-        <input
-          className={`text-gray-700 outline-none mt-4 p-4 rounded-2xl mb-10 w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
-          type="text"
-          placeholder="search for a friend..."
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
-          onKeyDown={handleKey}
-        />
+        <div className='relative mt-4 mb-10'>
+          <IoMdSearch size={"20px"} className='absolute top-[50%] left-1 -translate-y-[50%]'/>
+          <input
+            className={`text-gray-700 outline-none  pr-4 pt-4 pb-4 pl-7 rounded-2xl  w-52 focus:w-[40%] transition-all duration-1000 focus:min-w-52`}
+            type="text"
+            placeholder="search for a friend..."
+            value={user}
+            onChange={(e) => setUser(e.target.value)}
+            onKeyDown={handleKey}
+          />
+        </div>
         <div
           className={` grow flex flex-col justify-self-end overflow-auto gap-4`}
         >
-          {searchedUsers.map((user) => (
-            <AddFriendUser
-              initial={false}
-              key={user.uid}
-              email={user.email}
-              displayName={user.displayName}
-              photoURL={user.photoURL}
-              onClick={() => handleClick(user.uid)}
-            />
-          ))}
+          {searchedUsers.length > 0 ? (
+            searchedUsers.map((user) => (
+              <AddFriendUser
+                initial={false}
+                key={user.uid}
+                email={user.email}
+                displayName={user.displayName}
+                photoURL={user.photoURL}
+                onClick={() => handleClick(user.uid)}
+              />
+            ))
+          ) : (
+            <p>{err}</p>
+          )}
         </div>
       </div>
     );

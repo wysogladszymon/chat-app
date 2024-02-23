@@ -2,13 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  min-height: 100vh;
-  min-width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 
 #root {
   min-height: 100vh;

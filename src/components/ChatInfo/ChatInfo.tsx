@@ -11,6 +11,7 @@ interface ChatInfoProps {
   onClick: () => void;
   my: boolean,
   className?: string
+  children?:any
 }
 
 export const ChatInfo: FC<ChatInfoProps> = ({
@@ -20,7 +21,8 @@ export const ChatInfo: FC<ChatInfoProps> = ({
   picURL,
   onClick,
   className,
-  my
+  my,
+  children
 }) => {
   picURL = picURL || pic;
   
@@ -30,7 +32,7 @@ export const ChatInfo: FC<ChatInfoProps> = ({
     <div
       className={`${className || ''} ${theme ? 'hoverDarkColor' : 'hoverLightColor'} w-full p-5 flex items-center gap-5 cursor-pointer`}
       onClick={onClick}
-    >
+    >{children}
       <div
         className={`${styles.profilePhoto}`}
         style={{

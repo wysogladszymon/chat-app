@@ -13,7 +13,6 @@ export * from './ChatInfo';
 export * from './NavIcon';
 export * from './FriendRequestsMenu';
 export * from './AddFriendMenu';
-export * from './Welcome';
 export * from './AddFriendUser';
 export * from './FriendRequestUser';
 export * from './Arrow';

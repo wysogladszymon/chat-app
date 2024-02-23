@@ -10,15 +10,21 @@ import {
   AddFriendMenu,
   UserData,
   ChatInfo,
-  Welcome,
   FriendRequestUser,
 } from "../";
-import { arrayRemove, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  doc,
+  getDoc,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useActiveContext } from "../../store/ActiveContext";
 import { useAuthContext } from "../../store/AuthContext";
 import { db } from "../../config/firebase";
 import { getChatID } from "../../store/chatFunctions";
-import { formatDate } from "../../store/dateManagement";
+import { formatDate, formatHours } from "../../store/dateManagement";
 import { useThemeContext } from "../../store/ThemeContext";
 import styles from "./ChatApp.module.css";
 
@@ -44,6 +50,7 @@ export interface inboxInterface {
   lastmsg: message;
   user: User;
 }
+
 export const ChatApp: FC<ChatAppProps> = () => {
   const { currentUser } = useAuthContext();
   if (currentUser) {
@@ -54,6 +61,24 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const { theme } = useThemeContext();
     const [inboxLoaded, setInboxLoaded] = useState<boolean>(false);
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+    const [today, setToday] = useState<Date | null>(null);
+
+    function fetchActualDate() {
+      fetch("http://worldtimeapi.org/api/timezone/Europe/Warsaw")
+        .then((response) => response.json())
+        .then((data) => {
+          const actualDate = new Date(data.utc_datetime);
+          setToday(actualDate);
+        })
+        .catch((error) => {
+          console.log("Error fetching actual date:", error);
+        });
+      // fetch date every 1 hour
+      setTimeout(fetchActualDate, 3600000);
+    }
+    useEffect(() => {
+      fetchActualDate();
+    }, []);
 
     const handleFriendReq = () => {
       dispatchActive({ type: "FRIEND_REQUEST", payload: null });
@@ -72,7 +97,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
           displayName: us.displayName,
           email: us.email,
           photoURL: us.photoURL,
-          uid:us.uid
+          uid: us.uid,
         }),
       });
     };
@@ -176,7 +201,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
       handledecline(us);
       dispatchActive({ type: "CHAT", payload: { user: us, messages: [] } });
     };
-
 
     const chatInfoClick = async (u: inboxInterface) => {
       if (u.user !== activeState.chat?.user) setMessages([]);
@@ -350,7 +374,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
         debouncedFetchFriendRequests.cancel();
         debouncedFetchUserChats.cancel();
       };
-    }, [currentUser, activeState]);
+    }, [currentUser, activeState, today]);
 
     //it will fetch userdata changes like photo
     useEffect(() => {
@@ -389,48 +413,58 @@ export const ChatApp: FC<ChatAppProps> = () => {
     }, [inbox]);
 
     //will change between menus on mobile
-    useEffect(()=>{
+    useEffect(() => {
       console.log(windowWidth);
-      
-      if (windowWidth < 750){
-        const inboxselect = document.querySelector(`.${styles.inbox}`) as HTMLElement;
-        const messSelect = document.querySelector(`.${styles.messenger}`) as HTMLElement;
-        if(activeState.addFriend || activeState.chat || activeState.friendRequest){
+      const inboxselect = document.querySelector(
+        `.${styles.inbox}`
+      ) as HTMLElement;
+      const messSelect = document.querySelector(
+        `.${styles.messenger}`
+      ) as HTMLElement;
+      if (windowWidth < 750) {
+        if (
+          activeState.addFriend ||
+          activeState.chat ||
+          activeState.friendRequest
+        ) {
           inboxselect.style.display = "none";
           messSelect.style.display = "flex";
-        }
-        else{
+        } else {
           inboxselect.style.display = "flex";
           messSelect.style.display = "none";
         }
       }
-    },[activeState])
+      else{
+        inboxselect.style.display = "flex";
+        messSelect.style.display = "flex";
+      }
+    }, [activeState, windowWidth]);
 
     useEffect(() => {
       const handleResize = () => {
         setWindowWidth(window.innerWidth);
       };
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
       return () => {
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener("resize", handleResize);
       };
     }, []);
     return (
       <div
-        className={`h-screen flex justify-center items-center w-screen p-0 ${
+        className={`h-full flex justify-center items-center w-screen p-0 pt-20 absolute bottom-0 ${
           theme ? "text-white" : "text-gray-950"
         }`}
       >
         {/* sidebar */}
         <div
-          className={`flex flex-col h-[100dvh] p-0 pt-5 grow ${styles.inbox} ${
+          className={`flex flex-col h-[100dvh] mt-0 p-0  shrink-0 sticky grow ${styles.inbox} ${
             !theme ? "bg-white" : "bg-gray-950"
           }`}
         >
-          <div className="flex align-center justify-end content-between">
+          <div className="flex align-center mt-4 justify-end content-between">
             <ToggleThemeButton />
           </div>
-          <div className="mt-5 ">
+          <div className="mt-4 ">
             <AddFriend
               className={`${
                 activeState.addFriend
@@ -469,23 +503,33 @@ export const ChatApp: FC<ChatAppProps> = () => {
                 key={u.user.uid}
                 lastmsg={u.lastmsg.content}
                 date={
-                  u.lastmsg.date ? formatDate(new Date(u.lastmsg.date)) : ""
+                  u.lastmsg.date
+                    ? today?.toDateString() ===
+                      new Date(u.lastmsg.date).toDateString()
+                      ? formatHours(new Date(u.lastmsg.date)) + ' today'
+                      : formatDate(new Date(u.lastmsg.date))
+                    : ""
                 }
                 picURL={u.user.photoURL}
                 name={u.user.displayName}
-              />
+              >
+                {console.log(
+                  "data: (today) ",
+                  today?.toDateString(),
+                  "message date",
+                  new Date(u.lastmsg.date).toDateString()
+                )}
+              </ChatInfo>
             ))}
           </div>
           <UserData />
         </div>
         {/* current Chat */}
         <div
-          className={`h-[100dvh] flex-col grow-[9990] max-w-[1400px]  ${styles.messenger}  ${
-            theme ? "activeDarkColor" : "activeLightColor"
-          }`}
+          className={`h-[100dvh] flex-col grow-[9990] max-w-[1400px]  ${
+            styles.messenger
+          }  ${theme ? "activeDarkColor" : "activeLightColor"}`}
         >
-          <div className={`pt-4 pl-4 ${styles.nav}`}>
-          </div>
 
           {activeState.chat && (
             <Messages
@@ -498,7 +542,12 @@ export const ChatApp: FC<ChatAppProps> = () => {
                   my={currentUser?.uid === msg.uid}
                   key={index}
                   photoURL={msg.photoURL}
-                  date={formatDate(new Date(msg.date))}
+                  date={msg.date
+                    ? today?.toDateString() ===
+                      new Date(msg.date).toDateString()
+                      ? formatHours(new Date(msg.date))
+                      : formatDate(new Date(msg.date))
+                    : ""}
                 >
                   {msg.photoURL ? "" : msg.content}
                 </Message>
@@ -520,9 +569,6 @@ export const ChatApp: FC<ChatAppProps> = () => {
               ))}
             </FriendRequestsMenu>
           )}
-          {!activeState.friendRequest &&
-            !activeState.chat &&
-            !activeState.addFriend && <Welcome />}
         </div>
       </div>
     );

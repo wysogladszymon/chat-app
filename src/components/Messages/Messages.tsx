@@ -99,6 +99,7 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
     };
 
     const sendMessage = async () => {
+      if (message.length < 1) return;
       // get chatID and place there message
       const combinedID = getChatID(
         currentUser?.uid,
@@ -160,15 +161,17 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
       }
     }, [children]);
     return (
-      <div className="w-full h-full flex flex-col ">
+      <div className="w-full h-full flex flex-col  ">
         <div
-          className={`flex sticky ${
-            theme ? "border-b-gray-700 border-b-4" : "border-b-4"
+          className={`flex sticky top-0 ${
+            theme
+              ? "border-b-gray-700 border-b-4 activeDarkColor"
+              : "activeLightColor border-b-4"
           } p-5 items-center`}
         >
           <Arrow />
           <h1
-            className={`text-2xl ${
+            className={`text-xl ${
               theme ? "text-gray-200" : "text-gray-800"
             } ml-20`}
           >
@@ -176,16 +179,20 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
             {name}
           </h1>
         </div>
-        <div className={`${styles.scroll} grow flex flex-col justify-self-end`}>
+        <div
+          className={`${styles.scroll} grow flex flex-col justify-self-end p-3`}
+        >
           {children}
           <div ref={messagesEndRef} />
         </div>
         <div
-          className={`flex h-24 p-5  items-center justify-center ${
-            theme ? "text-gray-200" : "text-gray-500"
+          className={`flex h-24 pl-5 sticky bottom-1 pr-5 pt-5 pb-1  items-center justify-center ${
+            theme
+              ? "text-gray-200 activeDarkColor"
+              : "text-gray-500 activeLightColor"
           }`}
         >
-          <div className="w-10 mr-5 sticky">
+          <div className={`w-10 mr-5 `}>
             <label
               className={`${styles.changePhoto}`}
               htmlFor={styles.fileinput}
@@ -208,7 +215,7 @@ export const Messages: FC<MessagesProps> = ({ children, name }) => {
             }`}
             placeholder="write a message..."
           />
-          <button className="h-10 w-10 mr-5 ml-5">
+          <button className="h-10 w-10 ml-5">
             <LuSend
               color={"black"}
               onClick={sendMessage}
