@@ -1,5 +1,5 @@
 # 💬 Chat App 💬
-This application allows us to chat with our friends.
+This application allows us to chat with our friends in realtime.
 
 ## Features
 App allows you to:
