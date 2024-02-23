@@ -73,13 +73,15 @@ export const ChatApp: FC<ChatAppProps> = () => {
         .then((response) => response.json())
         .then((data) => {
           const actualDate = new Date(data.utc_datetime);
+          console.log(actualDate.toLocaleDateString());
+          
           setToday(actualDate);
         })
         .catch((error) => {
           console.log("Error fetching actual date:", error);
         });
       // fetch date every 1 hour
-      setTimeout(fetchActualDate, 3600000);
+      setTimeout(fetchActualDate, 60000);
     }
     useEffect(() => {
       fetchActualDate();
