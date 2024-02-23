@@ -6,9 +6,10 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth, googleProvider } from "../config/firebase";
+import { auth, db, googleProvider } from "../config/firebase";
 import { useAuthContext } from "../store/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 interface LoginPageProps {}
 
 export const LoginPage: FC<LoginPageProps> = () => {
@@ -41,9 +42,19 @@ export const LoginPage: FC<LoginPageProps> = () => {
     }
   };
   const googlelogin = async () => {
-    await signInWithPopup(auth, googleProvider).then((userCredential) => {
+    await signInWithPopup(auth, googleProvider).then(async (userCredential) => {
       const userdata = userCredential.user;
+      console.log("Registered succesfully: ", userdata);
+
       setCurrentUser(userdata);
+
+      await setDoc(doc(db, "users", userdata.uid), {
+        displayName: userdata.displayName,
+        displayNameLower: userdata.displayName?.toLowerCase(),
+        email: userdata.email,
+        photoURL: userdata.photoURL,
+        uid: userdata.uid,
+      });
       nav("/");
     });
   };
