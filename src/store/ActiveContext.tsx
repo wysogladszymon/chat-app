@@ -46,6 +46,7 @@ const activeReducer = (
         chat: null,
         addFriend: true,
         friendRequest: false,
+        search: false
       };
     case "FRIEND_REQUEST":
       return {
