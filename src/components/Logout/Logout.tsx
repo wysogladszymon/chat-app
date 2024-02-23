@@ -1,5 +1,4 @@
-import { FC, ReactNode } from "react";
-import styles from "./Logout.module.css";
+import { FC } from "react";
 import { useAuthContext } from "../../store/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase";
@@ -7,10 +6,9 @@ import { IoIosLogOut } from "react-icons/io";
 import { useThemeContext } from "../../store/ThemeContext";
 
 interface LogoutProps {
-  children?: ReactNode;
 }
 
-export const Logout: FC<LogoutProps> = ({ children }) => {
+export const Logout: FC<LogoutProps> = () => {
   const { setCurrentUser } = useAuthContext();
 
   const handleClick = async () => {

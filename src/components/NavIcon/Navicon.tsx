@@ -1,11 +1,10 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./Navicon.module.css";
 
 interface NavIconProps {
-  children?: ReactNode;
 }
 
-export const NavIcon: FC<NavIconProps> = ({ children }) => {
+export const NavIcon: FC<NavIconProps> = () => {
   const [clicked, setClicked] = useState<boolean>(false);
 
   return (

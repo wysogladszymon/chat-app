@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./Signup.module.css";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import { Google } from "../";
