@@ -18,3 +18,4 @@ export * from './FriendRequestUser';
 export * from './Arrow';
 export * from './ChatSearch';
 export * from './SearchChatMenu';
+export * from './PicturePreview';

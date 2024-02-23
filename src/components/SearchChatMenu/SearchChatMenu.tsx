@@ -31,8 +31,14 @@ export const SearchChatMenu: FC<SearchChatMenuProps> = ({
 
     const handleUserChange = (newUser: string) => {
       setUser(newUser);
-      const usersLeft = inbox.filter(
-        (elem) => elem.user.displayName.slice(0, newUser.length) === newUser
+
+      const modInb = inbox.map((elem) => {return {
+        user:{...elem.user, displayNameLower: elem.user.displayName.toLowerCase()},
+        lastmsg: elem.lastmsg
+      }})
+      
+      const usersLeft = modInb.filter(
+        (elem) => elem.user.displayNameLower.slice(0, newUser.length) === newUser.toLowerCase()
       );
       setSearchedUsers(usersLeft);
       if (usersLeft.length < 1)

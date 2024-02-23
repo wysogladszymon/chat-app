@@ -7,9 +7,16 @@ interface MessageProps {
   my: boolean;
   date: string;
   photoURL?: string;
+  photoClick?: () => void;
 }
 
-export const Message: FC<MessageProps> = ({ children, my, date, photoURL }) => {
+export const Message: FC<MessageProps> = ({
+  children,
+  my,
+  date,
+  photoURL,
+  photoClick,
+}) => {
   const { theme } = useThemeContext();
   const clsColor = my
     ? !theme
@@ -25,9 +32,10 @@ export const Message: FC<MessageProps> = ({ children, my, date, photoURL }) => {
   return (
     <div className={`${cls} mt-3 mb-3`}>
       {photoURL ? (
-        <div className={`rounded-lg overflow-hidden`}>
+        <div className={`rounded-lg overflow-hidden cursor-pointer  `}>
           <img
-            className={`${my ? "ml-auto" : "mr-auto"} rounded-lg w-[70%]`}
+            onClick={photoClick}
+            className={`${my ? "ml-auto" : "mr-auto"} rounded-lg max-w-[min(700px,70%)] max-h-[700px]`}
             src={photoURL}
             alt="Uploaded Photo"
           />

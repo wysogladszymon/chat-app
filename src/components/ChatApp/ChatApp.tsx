@@ -13,6 +13,7 @@ import {
   FriendRequestUser,
   ChatSearch,
   SearchChatMenu,
+  PicturePreview,
 } from "../";
 import {
   arrayRemove,
@@ -65,6 +66,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
     const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
     const [today, setToday] = useState<Date | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const [photo, setPhoto] = useState<string | null>(null);
 
     function fetchActualDate() {
       fetch("http://worldtimeapi.org/api/timezone/Europe/Warsaw")
@@ -543,6 +545,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
             ))}
           </div>
           <UserData />
+        <div ref={bottomRef} />
         </div>
         {/* current Chat */}
         <div
@@ -568,7 +571,9 @@ export const ChatApp: FC<ChatAppProps> = () => {
                         ? formatHours(new Date(msg.date))
                         : formatDate(new Date(msg.date))
                       : ""
+                    
                   }
+                  photoClick={msg.photoURL ? ()=> setPhoto(msg.photoURL || null) : undefined }
                 >
                   {msg.photoURL ? "" : msg.content}
                 </Message>
@@ -593,6 +598,7 @@ export const ChatApp: FC<ChatAppProps> = () => {
           {activeState.search && <SearchChatMenu today={today} chatInfoClick={chatInfoClick} inbox={inbox}/>}
         </div>
         <div ref={bottomRef} />
+        {photo && <PicturePreview onClick={()=> setPhoto(null)} photoURL={photo}/>}
       </div>
     );
   }
