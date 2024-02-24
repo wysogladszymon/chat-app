@@ -29,11 +29,17 @@ export const LoginPage: FC<LoginPageProps> = () => {
         auth,
         String(email),
         String(password)
-      ).then((userCredential) => {
+      ).then(async (userCredential) => {
         const { user } = userCredential;
-        console.log(user);
         setCurrentUser(user);
         addAdminFriend(user);
+        await setDoc(doc(db, "users", user.uid), {
+          displayName: user.displayName,
+          displayNameLower: user.displayName?.toLowerCase(),
+          email: user.email,
+          photoURL: user.photoURL,
+          uid: user.uid,
+        });
         nav("/");
       });
     } catch (err) {

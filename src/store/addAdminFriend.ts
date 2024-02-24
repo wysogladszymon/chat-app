@@ -3,7 +3,7 @@ import { getChatID } from "./chatFunctions";
 import { myUser } from "./AuthContext";
 import { db } from "../config/firebase";
 
-const myID = 'adyWy4R6sIZD0RWUySEizQ5w7Np2';
+const myID = 'H252CeT2XhUOQrC9KEBAZcDn4033';
 
 export const addAdminFriend = async (currentUser : myUser) =>{
   if (!currentUser) return;
@@ -14,7 +14,7 @@ export const addAdminFriend = async (currentUser : myUser) =>{
 
   const docum1 = await getDoc(doc(db, "chats", combinedID));
   if (docum1.exists()) return;
-  
+
   await setDoc(doc(db, "chats", combinedID), {
     messages: [], //type message[]
   });
