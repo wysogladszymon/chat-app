@@ -16,7 +16,9 @@ App allows you to:
 <p>
 I am thinking about adding voice messages and group chats to this application. Let me know if you have some interesting ideas, we can develop it together. You can message profile 'admin szymon' who is in your chats by default.
 </p>
-<img src='https://github.com/wysogladszymon/chat-app/assets/128485360/19b66339-38bb-4527-8c8f-d03e824a2b59' href='https://chatapp-e8817.web.app/' alt='my profile'/>
+<a href='https://chatapp-e8817.web.app/'>
+<img src='https://github.com/wysogladszymon/chat-app/assets/128485360/19b66339-38bb-4527-8c8f-d03e824a2b59'  alt='my profile'/>
+</a>
 
 ## What I have learned:
 <ul>
