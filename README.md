@@ -12,6 +12,9 @@ App allows you to:
 <li>Change your profile photo. </li>
 </ul>
 
+## Future upgrades
+I am thinking about adding voice messages and group chats to this application. Let me know if you have some interesting ideas, we can develop it together. You can message profile 'admin szymon' who is in your chats by default.
+
 ## What I have learned:
 <ul>
 <li>I practiced my React and Typescript skills.</li>

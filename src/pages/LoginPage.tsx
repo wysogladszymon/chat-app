@@ -2,14 +2,12 @@ import { FC, useState } from "react";
 import { Login } from "../components";
 import { useThemeContext } from "../store/ThemeContext";
 import { ToggleThemeButton } from "../components";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, db, googleProvider } from "../config/firebase";
 import { useAuthContext } from "../store/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
+import { addAdminFriend } from "../store/addAdminFriend";
 interface LoginPageProps {}
 
 export const LoginPage: FC<LoginPageProps> = () => {
@@ -35,6 +33,7 @@ export const LoginPage: FC<LoginPageProps> = () => {
         const { user } = userCredential;
         console.log(user);
         setCurrentUser(user);
+        addAdminFriend(user);
         nav("/");
       });
     } catch (err) {
@@ -55,8 +54,9 @@ export const LoginPage: FC<LoginPageProps> = () => {
         photoURL: userdata.photoURL,
         uid: userdata.uid,
       });
-      nav("/");
+      addAdminFriend(userdata);
     });
+    nav("/");
   };
 
   return (

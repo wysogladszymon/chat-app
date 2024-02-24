@@ -11,6 +11,7 @@ import { auth, googleProvider, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../store/AuthContext";
 import { doc, setDoc } from "firebase/firestore";
+import { addAdminFriend } from "../store/addAdminFriend";
 interface SignupPageProps {}
 
 export const SignupPage: FC<SignupPageProps> = () => {
@@ -39,6 +40,11 @@ export const SignupPage: FC<SignupPageProps> = () => {
         ...res.user,
         displayName: username,
       });
+      addAdminFriend({
+        ...res.user,
+        displayName: username,
+      });
+
       console.log("Registered succesfully: ", res.user);
       await setDoc(doc(db, "users", res.user.uid), {
         displayName: res.user.displayName,
@@ -66,6 +72,7 @@ export const SignupPage: FC<SignupPageProps> = () => {
         photoURL: userdata.photoURL,
         uid: userdata.uid,
       });
+      addAdminFriend(userdata);
       nav("/");
     });
   };
