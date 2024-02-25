@@ -32,7 +32,6 @@ export const LoginPage: FC<LoginPageProps> = () => {
       ).then(async (userCredential) => {
         const { user } = userCredential;
         setCurrentUser(user);
-        addAdminFriend(user);
         await setDoc(doc(db, "users", user.uid), {
           displayName: user.displayName,
           displayNameLower: user.displayName?.toLowerCase(),
